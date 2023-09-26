@@ -10,7 +10,7 @@ const SystemAdminaddForm = lazy(() =>
   import("../../views/SystemAdmin/SystemAdminaddForm")
 )
 
-const SystemAdminRoute = [
+const SystemAdmin = [
   {
     id: "systemAdmins",
     path: "/system-admins",
@@ -52,4 +52,4 @@ const SystemAdminRoute = [
     },
   },
 ]
-export default SystemAdminRoute
+export default SystemAdmin
