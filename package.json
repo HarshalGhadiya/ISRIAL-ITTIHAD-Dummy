@@ -105,7 +105,6 @@
   },
   "scripts": {
     "start": "vite",
-    "postinstall": "npm install",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.js\"",
