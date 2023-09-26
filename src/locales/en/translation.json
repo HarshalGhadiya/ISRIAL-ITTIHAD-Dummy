@@ -1,0 +1,367 @@
+{
+  "error_msg": {
+    "email": {
+      "invalid": "Invalid email address",
+      "required": "Email is required"
+    },
+    "password": {
+      "required": "Password is required"
+    },
+    "otp_code": {
+      "required": "OTP is required"
+    },
+    "new_password": {
+      "required": "New password is required",
+      "formate": "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+    },
+    "repeat_password": {
+      "required": "Repeat password is required",
+      "formate": "Passwords must match"
+    },
+    "firstname": {
+      "required": "First name is required"
+    },
+    "lastname": {
+      "required": "Last name is required"
+    },
+    "phone": {
+      "required": "Phone is required"
+    },
+    "site": {
+      "required": "Site is required"
+    },
+    "status": {
+      "required": "Status is required"
+    }
+  },
+  "login_card": {
+    "title": "Login",
+    "forms": {
+      "email_label": "Email",
+      "password_label": "Password",
+      "login_button_Label": "Login",
+      "email_placeholder": "Email",
+      "password_placeholder": "Password"
+    },
+    "forgot_password": "Forgot password?"
+  },
+  "otp_code_card": {
+    "title": "OTP Code",
+    "des_otp": "We sent you an OTP code to your email :",
+    "des_otp2": "Ending with this email :",
+    "forms": {
+      "otp_lable_placholder": "Enter OTP Code",
+      "login_button_Label": "Login"
+    }
+  },
+  "forgot_password_card": {
+    "title": "Forgot password",
+    "des": "Please enter your email address",
+    "forms": {
+      "email_label": "Email",
+      "send_button": "Send",
+      "back_buton": "Back",
+      "email_placeholder": "Email"
+    }
+  },
+  "reset_password_card": {
+    "title": "Reset password",
+    "forms": {
+      "new_password_label": "New password",
+      "repeat_password": "Repeat password",
+      "reset_button": "Reset"
+    }
+  },
+  "system_admin": {
+    "browser_title":"Add Admin",
+    "title":"System admins",
+    "admin_list":"Admin list",
+    "admin_type": "Admin types",
+    "show":"show",
+    "search":"Search",
+    "dropdown_option": {
+      "site": {
+        "sys_admin": "System Admin",
+        "israel": "Israel Back Office",
+        "ittihad": "Ittihad Back Office"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "deleted": "Deleted"
+      }
+    },
+    "titles": {
+      "sys_backoffice": "System Back Office",
+      "isreal_backoffice": "Israel Today Back Office",
+      "ittihad_backoffice": "Ittihad Today Back Office",
+      "sys_admin": "System admins"
+    },
+    "forms":{
+      "status":"Status",
+      "site":"Site",
+      "user_type":"User type",
+      "firstname":{
+        "lable":"First name",
+        "placehoder":"First name"
+      },
+      "lastname": {
+        "lable": "Last name",
+        "placehoder": "Last name"
+      },
+      "email": {
+        "lable": "Email",
+        "placehoder": "Email"
+      },
+      "phone": {
+        "lable": "Phone",
+        "placehoder": "Phone"
+      },
+      "password": {
+        "lable": "Password",
+        "placehoder": "Password"
+      },
+        "repeat_password": {
+          "lable": "Repeat password",
+          "placehoder": "Repeat password"
+        }
+    },
+    "table":{
+      "header":{
+        "id":"Id",
+        "status":"Status",
+        "site":"Site",
+        "fullname":"Full name",
+        "email":"Email",
+        "phone":"Phone",
+        "last_seen":"Last seen",
+        "update":"Updated",
+        "type_name":"Type name"
+      }
+
+    }
+  },
+  "sidebar": {
+    "system_admins": "System admins"
+  },
+  "headers": {
+    "title": "System admins",
+    "new_button": "New",
+    "export_xls": "Export XLS"
+  },
+  "data_table": {
+    "header": {
+      "search_box_lable": "Search"
+    },
+    "table_filed": {
+      "id": "id",
+      "status": "Status",
+      "site": "Site",
+      "full_name": "Full name",
+      "user_type": "User type",
+      "email": "Email",
+      "phone": "Phone",
+      "last_seen": "Last seen",
+      "updated": "Updated"
+    }
+  },
+  "update_data_card": {
+    "title": "ROW ID:1234",
+    "save_button": "Save",
+    "forms": {
+      "status_lable": "Status",
+      "site_lable": "Site",
+      "full_name_lable": "Full name",
+      "user_type_lable": "User type",
+      "email_lable": "Email",
+      "phone_lable": "Phone"
+    },
+    "password": {
+      "title": "Password",
+      "update_button": "Update Password",
+      "forms": {
+        "password_lable": "Password",
+        "reapeat_password": "Repeat Password"
+      }
+    }
+  },
+  "harmful_word": {
+    "delete_popup": {
+      "title": "Are you sure?",
+      "text": "You won't be able to revert this!",
+      "confirmButtonText": "Yes, delete it!"
+    },
+    "header": "Harmful words",
+    "word": "Word",
+    "worderror": "Harmful word is required"
+  },
+  "sitename": {
+    "israel": "israel today back office",
+    "ittihad": "ittihad today back office",
+    "israelAdmin": "israel today admin",
+    "ittihadAdmin": "ittihad admin"
+  },
+  "tableColum": {
+    "id": "Id",
+    "Word": "Word",
+    "Updated": "Updated",
+    "status": "Status",
+    "approved": "Approved",
+    "pending": "Pending",
+    "origin_site": "Origin site",
+    "user": "User",
+    "page_name": "Page name",
+    "comment": "Comment",
+    "submit_date": "Submit date",
+    "approval_date": "Approval date",
+    "approval_admin": "Approval admin",
+    "NA": "N/A",
+    "search": "Search",
+    "event": "Event",
+    "date": "Date",
+    "data": "Data",
+    "history_log": "History log",
+    "israelStatus" : "Israel t status",
+    "ittihadStatus" : "Ittihad status",
+    "active" : "Active",
+    "notApproved" : "Not approved",
+    "israelPage" : "Israel t page",
+    "ittihadPage" : "Ittihad page",
+    "israelComment" : "Israel t Comment",
+    "ittihadComment" : "Ittihad comment",
+    "israelPdate" : "Israel t public date",
+    "ittihadPdate" : "Ittihad public date"
+  },
+  "title": {
+    "israelharmfulword": "Harmfulword - israel today back office",
+    "ittihadharmfulword": "Harmfulword - ittihad today back office",
+    "addharmfulword": "Add harmfulword",
+    "editharmfulword": "Edit harmfulword",
+    "comment": "Comments",
+    "Edit_comment": "Edit comment",
+    "page" : "Pages"
+  },
+  "export": "Export XLS",
+  "new": "New",
+  "errormsg": "You are not authorize to access",
+  "back": "Back",
+  "roomId": "Room id",
+  "save": "Save",
+  "activeLabel" : "Approved", 
+  "inActiveLabel" : "Pending",
+  "activeValue" : "approved",
+  "inActiveValue" : "pending",
+  "delete_alert_title": "You won't be able to revert this!",
+  "Comment": {
+    "status": "Status",
+    "origin_site": "Origin site",
+    "submit_date": "Submit date",
+    "approval_date": "Approval date",
+    "approval_admin": "Approval admin",
+    "page_name": "Page name",
+    "israel_button": "View page on israel today",
+    "itthad_button": "View page on ittihad",
+    "comment_data": "Comment data",
+    "comment_hebrew": "Origin comment hebrew",
+    "comment_arbic": "Origin comment arbic",
+    "cooment_translate": "Comment automatics translation",
+    "editComment_hebrew": "Edited comment hebrew  - edited by ",
+    "editComment_arbic": "Edited comment arbic  - edited by ",
+    "commentError": "Comment is required",
+    "userInfo": "User info"
+  },
+  "Page" : {
+    "israelPageInfo" : "Israel today page info",
+    "ittihadPageInfo" : "Ittihad today page info",
+    "activeLabel" : "Active",
+    "activeValue" : "active",
+    "inactiveLabel" : "Inactive",
+    "inactiveValue" : "inActive",
+    "statusErr" : "Status is required",
+    "pageErr" : "Page name is required",
+    "pageUrlErr" : "Page URL is required",
+    "totalComment" : "Total comments",
+    "publicDate" : "Publish date",
+    "publicAdmin" : "Publish admin",
+    "pageName" : "Page name",
+    "pageURL" : "Page URL",
+    "viewPage" : "View page",
+    "embededScript" : "Embedded script",
+    "copyScript" : "Copy script"
+  },
+  "settingPage":{
+    "ittihad_header":"Ittihad settings",
+    "israel_header":"Israel settings",
+    "senpage_notification":"Send new pages notifications to",
+    "comment_notification":"Send new comment notifications to",
+    "bannr_image":"Top banner image",
+    "logo_image":"Logo image",
+    "login_image":"Login image",
+    "must_login":"Must login to post a comment",
+    "top_title":"Top title",
+    "sub_title":"Sub title",
+    "footer_title":"Footer title",
+    "terms_private":"Terms and privacy policy text",
+    "url_parms":"URL for terms and privacy policy",
+    "google_client_id":" Google signing client id",
+    "from_name":"From name",
+    "replay_to":"Reply to",
+    "Subject":"Subject",
+    "message":"Message"
+  },
+  "roleType" : {
+    "notApplicableValue" : "not-applicable",
+    "notApplicableLabel" : "Not Applicable",
+    "readWriteValue" : "read-write",
+    "readWriteLabel" : "Read & Write",
+    "readValue" : "read",
+    "readLabel" : "Read",
+    "usersValue" : "users",
+    "usersLabel" : "Users",
+    "pagesValue" : "pages",
+    "pagesLabel" : "Pages",
+    "commentsValue" : "comments",
+    "commentsLabel" : "Comments",
+    "harmfulWordsValue" : "harmfulWords",
+    "harmfulWordsLabel" : "Harmful Words",
+    "settingsValue" : "settings",
+    "settingsLabel" : "Settings",
+    "systemAdminsValue" : "systemAdmins",
+    "systemAdminsLabel" : "System Admins",
+    "nameError" : "Type name is required",
+    "userError" : "User is required",
+    "pageError" : "Pages is required",
+    "commentError" : "Comments is required",
+    "harmfulWordsError" : "Harmful words is required",
+    "settingsError" : "Settings is required",
+    "systemAdminsError" : "System Admins is required",
+    "editRole" : "Edit Role - ",
+    "addRole" : "Add Role - ",
+    "systemBackOffice" : "System Back Office",
+    "israelTitle" : "Israel Today Back Office",
+    "ittihadTitle" : "Ittihad Today Back Office",
+    "title" : "System Admins",
+    "typeName" : "Type name",
+    "section" : "Section",
+    "permission" : "Permission"
+  },
+  "user":{
+     "title":"Users",
+     "user_list":{
+      "id":"Id",
+      "status":"Status",
+      "name":"Name",
+      "site":"site",
+      "comment":"Comment",
+      "lastseen":"lastseen",
+      "registration":"Registration",
+      "email":"Email",
+      "device":"Device",
+       "user_edit_form":{
+           "name":"Nickname" ,
+            "site":"Site"
+                
+       }
+      }
+  }
+}

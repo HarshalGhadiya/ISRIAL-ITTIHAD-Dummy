@@ -1,0 +1,298 @@
+
+.required-red {
+    color: #FF4D4F;
+    font-style: normal;
+}
+.bottom-avatar-detail {
+    position: absolute;
+    bottom: 0;
+    padding: 20px;
+    width: 100%;
+
+    .avatar-detail-wrap {
+        display: flex;
+        .avatar-img {
+            img {
+                min-width: 26px;
+                min-height: 26px;
+                object-fit: cover;
+                margin-right: 10px;
+            }
+        }
+        .avatar-detail {
+            .avatar-name {
+                color: #fff;
+                 
+            }
+            .avatar-email-detail {
+                color: #BFBFBF;
+            }
+        }
+    }
+    .avatar-logout {
+        border-top: 1px solid #bfbfbf36;
+        margin-top: 10px;
+        padding-top: 10px;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.main-menu .navbar-header .navbar-brand .brand-logo.ittihad-logo img {
+    max-width: 90px;
+}
+.react-dataTable img.img-fluid {
+    max-height: 30px;
+}
+
+
+.react-dataTable::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: rgba(207, 211, 236, 0.3);
+}
+
+.react-dataTable::-webkit-scrollbar
+{
+	height: 6px;
+	background-color: rgba(207, 211, 236, 0.3);
+}
+
+.react-dataTable::-webkit-scrollbar-thumb
+{
+	background-color: rgba(207, 211, 236, 0.8);
+}
+.react-dataTable .rdt_TableHead .rdt_TableHeadRow .rdt_TableCol .rdt_TableCol_Sortable {
+    text-transform: inherit !important; 
+}
+
+.header-navbar .navbar-container ul.navbar-nav li a.dropdown-user-link img {
+    box-shadow: none;
+}
+.text-inherit {
+    text-transform: inherit !important; 
+}
+.avatar-name:first-letter {
+  text-transform: capitalize;
+}
+// Comment section 
+
+.commentwrap {
+    padding: 40px 15px;
+    max-width: 1254px;
+    margin: 0 auto;
+
+    .title {
+        h1 {
+            font-weight: 300;
+            font-size: 62px;
+        }
+    }
+
+    .sub-title {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        h3 {
+            font-weight: 300;
+            font-size: 22px;
+        }
+    }
+    .comment-logo {
+        text-align: left;
+    }
+    .comments-number {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0;
+    }
+
+    .comment-sec {
+        gap: 28px;
+        padding-bottom: 15px;
+
+        .userimage {
+            min-width: 150px;
+            text-align: right;
+            position: relative;
+
+            .userimage-logo {
+                position: absolute;
+                z-index: 1;
+                right: 65px;
+                top: 12px;
+            }
+        }
+        .form-label {
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0;
+        }
+        .comment-text {
+            font-size: 16px;
+            font-weight: 500;
+            text-align: right;
+        }
+        .post-time {
+            font-size: 16px;
+            font-weight: 400;
+            min-width: 160px;
+            color: rgba(0, 0, 0, 0.6);
+            text-align: left;
+        }
+        .comment-bottom {
+            align-items: center;
+            display: flex;
+            justify-content: start;
+            margin-top: 25px;
+            .comment-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                font-weight: 500;
+                font-size: 16px;
+            }
+            .comment-like {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                margin-left: 25px;
+                font-weight: 500;
+                font-size: 16px;
+            }
+        }
+    }
+    .sub-comment {
+        padding-right: 150px;
+    }
+    .divider {
+        display: inline-block;
+        width: 100%;
+        height: 1px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        margin-top: 0;
+    }
+
+}
+
+
+
+.authentication {
+    .modal-header {
+        padding: 0;
+        .btn-close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            z-index: 1;
+            transform: inherit;
+            &:hover, &:active, &:focus {
+                transform: inherit !important;
+                right: 20px;
+            }
+        }
+    }
+    .top-sec {
+        min-height: 440px;
+    }
+    .title {
+        text-align: center;
+        h2 {
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            vertical-align: top;
+            width: 100%;
+        }
+        span {
+            color: #E8505B;
+        }
+        h4 {
+            font-size: 14px;
+            font-weight: 400;
+            margin: 5px 0 0 0;
+            padding: 0;
+            line-height: normal;
+        }
+    }
+    .o-option {
+        div {
+            position: relative;
+            width: 100%;
+            display: inline-block;
+            margin: 25px 0 15px 0;
+            span {
+                background: #f6f6f6;
+                display: inline-block;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                padding: 5px 15px;
+            }
+            &::before{
+                position: absolute;
+                content: "";
+                height: 1px;
+                width: 100%;
+                background: #adadad;
+                top: 50%;
+                left: 0;
+                z-index: 0;
+            }
+        }
+    }
+    .password-input {
+        .input-group-text {
+            border-radius: 0.357rem !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+        .form-control {
+            border-radius: 0.357rem !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            border: 1px solid #d8d6de !important;
+            border-left: 0 !important;
+            padding: 0.571rem 1rem !important;
+        }
+    }
+    .f-password {
+        span {
+            color: #E8505B;
+            font-weight: 500;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    }
+    .g-login {
+        margin: 35px 0;
+        iframe {
+            left: 0 !important;
+            right: 0 !important;
+            margin: 0 auto !important;
+        }
+    }
+    .r-link {
+        margin-bottom: 25px;
+        span {
+            color: #000;
+            font-weight: 500;
+            &.link {
+                color: #E8505B;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+        }
+    }
+    .f-logo {
+        & img {
+            max-width: 155px;
+            height: auto;
+        }
+    }
+}
