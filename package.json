@@ -105,7 +105,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "CI=true vite build",
+    "build": "CI='' vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.js\"",
     "lint": "eslint src/**/*.js src/**/*.js",
