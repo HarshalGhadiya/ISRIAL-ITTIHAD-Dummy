@@ -25,14 +25,43 @@
       "required": "Last name is required"
     },
     "phone": {
-      "required": "Phone is required"
+      "required": "Phone is required",
+      "min":"Phone number must be at least 6 characters",
+      "max":"Phone number cannot exceed 20 characters"
     },
     "site": {
       "required": "Site is required"
     },
     "status": {
       "required": "Status is required"
-    }
+    },
+    "pages_notifications": {
+      "required": "Page notifications is required",
+      "min": "Select at least one option"
+    },
+    "comment_notifications": {
+      "required": "Comment notifications is required",
+      "min": "Select at least one option"
+    },
+    "image": {
+      "required": "Please select an image",
+      "filesize": "File size is too large enter only 1 mb file",
+      "filetype": "Pleace upload only jpg,png,jpeg"
+    },
+    "top_title": "Top title is required",
+    "sub_title": "Sub title is required",
+    "url_parms": "URL for perms and privacy policy is required",
+    "google_id": "Google client id is required",
+    "confirm_email_sub": "Confirm email subject is required",
+    "footer_title": "Footer text is required",
+    "terms_private": "Terms and privacy policy is required",
+    "confirm_email": "Confirm email message is required",
+    "reset_email_sub": "Reset email subject is required",
+    "reset_email_message": "Reset email message is required",
+    "new_page_sub": "New page email subject is required",
+    "new_page_email_message": "Newpage email message  is required",
+    "new_comment_sub": "New commit email subject is required",
+    "new_comment_message": "New comment email message is required"
   },
   "login_card": {
     "title": "Login",
@@ -73,12 +102,12 @@
     }
   },
   "system_admin": {
-    "browser_title":"Add Admin",
-    "title":"System admins",
-    "admin_list":"Admin list",
+    "browser_title": "Add Admin",
+    "title": "System admins",
+    "admin_list": "Admin list",
     "admin_type": "Admin types",
-    "show":"show",
-    "search":"Search",
+    "show": "show",
+    "search": "Search",
     "dropdown_option": {
       "site": {
         "sys_admin": "System Admin",
@@ -97,13 +126,13 @@
       "ittihad_backoffice": "Ittihad Today Back Office",
       "sys_admin": "System admins"
     },
-    "forms":{
-      "status":"Status",
-      "site":"Site",
-      "user_type":"User type",
-      "firstname":{
-        "lable":"First name",
-        "placehoder":"First name"
+    "forms": {
+      "status": "Status",
+      "site": "Site",
+      "user_type": "User type",
+      "firstname": {
+        "lable": "First name",
+        "placehoder": "First name"
       },
       "lastname": {
         "lable": "Last name",
@@ -121,24 +150,25 @@
         "lable": "Password",
         "placehoder": "Password"
       },
-        "repeat_password": {
-          "lable": "Repeat password",
-          "placehoder": "Repeat password"
-        }
-    },
-    "table":{
-      "header":{
-        "id":"Id",
-        "status":"Status",
-        "site":"Site",
-        "fullname":"Full name",
-        "email":"Email",
-        "phone":"Phone",
-        "last_seen":"Last seen",
-        "update":"Updated",
-        "type_name":"Type name"
+      "repeat_password": {
+        "lable": "Repeat password",
+        "placehoder": "Repeat password"
       }
-
+    },
+    "table": {
+      "header": {
+        "id": "Id",
+        "status": "Status",
+        "site": "Site",
+        "fullname": "Full name",
+        "email": "Email",
+        "updatedBy": "Updated by",
+        "phone": "Phone",
+        "last_seen": "Last seen",
+        "update": "Updated",
+        "user_type": "User type",
+        "type_name": "Type name"
+      }
     }
   },
   "sidebar": {
@@ -147,7 +177,7 @@
   "headers": {
     "title": "System admins",
     "new_button": "New",
-    "export_xls": "Export XLS"
+    "export_xls": "Export to Excel"
   },
   "data_table": {
     "header": {
@@ -196,8 +226,9 @@
     "worderror": "Harmful word is required"
   },
   "sitename": {
-    "israel": "israel today back office",
-    "ittihad": "ittihad today back office",
+    "israel": "Israel Today Back Office",
+    "ittihad": "Ittihad Today Back Office",
+    "sys_backoffice": "System Back Office",
     "israelAdmin": "israel today admin",
     "ittihadAdmin": "ittihad admin"
   },
@@ -211,6 +242,7 @@
     "origin_site": "Origin site",
     "user": "User",
     "page_name": "Page name",
+    "page_url": "Page URL",
     "comment": "Comment",
     "submit_date": "Submit date",
     "approval_date": "Approval date",
@@ -221,36 +253,45 @@
     "date": "Date",
     "data": "Data",
     "history_log": "History log",
-    "israelStatus" : "Israel t status",
-    "ittihadStatus" : "Ittihad status",
-    "active" : "Active",
-    "notApproved" : "Not approved",
-    "israelPage" : "Israel t page",
-    "ittihadPage" : "Ittihad page",
-    "israelComment" : "Israel t Comment",
-    "ittihadComment" : "Ittihad comment",
-    "israelPdate" : "Israel t public date",
-    "ittihadPdate" : "Ittihad public date"
+    "israelStatus": "Israel T status",
+    "ittihadStatus": "Ittihad status",
+    "active": "Active",
+    "notApproved": "Not approved",
+    "israelPage": "Israel T page",
+    "ittihadPage": "Ittihad page",
+    "israelComment": "Israel T comment",
+    "ittihadComment": "Ittihad comment",
+    "israelPdate": "Israel T publish date",
+    "ittihadPdate": "Ittihad publish date",
+    "israelPdate_Updateby": "Updated by (Israel T publish date)",
+    "ittihadPdate_Updateby": "Updated by (Ittihad publish date)",
+    "update_data": "Updated data",
+    "comment_history": "Comment_histrory",
+    "page_histrory": "Page_histrory"
   },
   "title": {
-    "israelharmfulword": "Harmfulword - israel today back office",
-    "ittihadharmfulword": "Harmfulword - ittihad today back office",
-    "addharmfulword": "Add harmfulword",
-    "editharmfulword": "Edit harmfulword",
+    "israelharmfulword": "Harmfulword - Israel Today Back Office",
+    "ittihadharmfulword": "Harmfulword - Ittihad Today Back Office",
+    "addharmfulword": "Add Harmfulword",
+    "editharmfulword": "Edit Harmfulword",
     "comment": "Comments",
-    "Edit_comment": "Edit comment",
-    "page" : "Pages"
+    "Edit_comment": "Edit Comment",
+    "page": "Pages",
+    "addPage": "Add Page",
+    "editPage": "Edit Page"
   },
-  "export": "Export XLS",
+  "export": "Export to Excel",
   "new": "New",
   "errormsg": "You are not authorize to access",
   "back": "Back",
-  "roomId": "Room id",
+  "roomId": "Row id",
   "save": "Save",
-  "activeLabel" : "Approved", 
-  "inActiveLabel" : "Pending",
-  "activeValue" : "approved",
-  "inActiveValue" : "pending",
+  "activeLabel": "Approved",
+  "inActiveLabel": "Pending",
+  "activeValue": "approved",
+  "inActiveValue": "pending",
+  "notApprovedValue": "notApproved",
+  "notApprovedLabel": "Not approved",
   "delete_alert_title": "You won't be able to revert this!",
   "Comment": {
     "status": "Status",
@@ -270,98 +311,160 @@
     "commentError": "Comment is required",
     "userInfo": "User info"
   },
-  "Page" : {
-    "israelPageInfo" : "Israel today page info",
-    "ittihadPageInfo" : "Ittihad today page info",
-    "activeLabel" : "Active",
-    "activeValue" : "active",
-    "inactiveLabel" : "Inactive",
-    "inactiveValue" : "inActive",
-    "statusErr" : "Status is required",
-    "pageErr" : "Page name is required",
-    "pageUrlErr" : "Page URL is required",
-    "totalComment" : "Total comments",
-    "publicDate" : "Publish date",
-    "publicAdmin" : "Publish admin",
-    "pageName" : "Page name",
-    "pageURL" : "Page URL",
-    "viewPage" : "View page",
-    "embededScript" : "Embedded script",
-    "copyScript" : "Copy script"
+  "Page": {
+    "israelPageInfo": "Israel today page info",
+    "ittihadPageInfo": "Ittihad today page info",
+    "activeLabel": "Active",
+    "activeValue": "active",
+    "pendingLabel": "Pending",
+    "pendingValue": "pending",
+    "notApprovedLabel": "Not approved",
+    "notApprovedValue": "notApproved",
+    "statusErr": "Status is required",
+    "pageErr": "Page name is required",
+    "pageUrlErr": "Page URL is required",
+    "urlFormatErr": "Please use a valid URL format with 'https://' or 'http://'",
+    "totalComment": "Total comments",
+    "publicDate": "Publish date",
+    "publicAdmin": "Publish admin",
+    "pageName": "Page name",
+    "pageURL": "Page URL",
+    "viewPage": "View page",
+    "embededScript": "Embedded script",
+    "copyScript": "Copy script"
   },
-  "settingPage":{
-    "ittihad_header":"Ittihad settings",
-    "israel_header":"Israel settings",
-    "senpage_notification":"Send new pages notifications to",
-    "comment_notification":"Send new comment notifications to",
-    "bannr_image":"Top banner image",
-    "logo_image":"Logo image",
-    "login_image":"Login image",
-    "must_login":"Must login to post a comment",
-    "top_title":"Top title",
-    "sub_title":"Sub title",
-    "footer_title":"Footer title",
-    "terms_private":"Terms and privacy policy text",
-    "url_parms":"URL for terms and privacy policy",
-    "google_client_id":" Google signing client id",
-    "from_name":"From name",
-    "replay_to":"Reply to",
-    "Subject":"Subject",
-    "message":"Message"
+  "settingPage": {
+    "ittihad_header": "Ittihad settings",
+    "israel_header": "Israel settings",
+    "senpage_notification": "Send new pages notifications to",
+    "comment_notification": "Send new comment notifications to",
+    "bannr_image": "Top banner image",
+    "logo_image": "Logo image",
+    "login_image": "Login image",
+    "must_login": "Must login to post a comment",
+    "top_title": "Top title",
+    "sub_title": "Sub title",
+    "footer_title": "Footer title",
+    "terms_private": "Terms and privacy policy text",
+    "url_parms": "URL for terms and privacy policy",
+    "google_client_id": " Google signing client id",
+    "from_name": "From name",
+    "replay_to": "Reply to",
+    "Subject": "Subject",
+    "message": "Message"
   },
-  "roleType" : {
-    "notApplicableValue" : "not-applicable",
-    "notApplicableLabel" : "Not Applicable",
-    "readWriteValue" : "read-write",
-    "readWriteLabel" : "Read & Write",
-    "readValue" : "read",
-    "readLabel" : "Read",
-    "usersValue" : "users",
-    "usersLabel" : "Users",
-    "pagesValue" : "pages",
-    "pagesLabel" : "Pages",
-    "commentsValue" : "comments",
-    "commentsLabel" : "Comments",
-    "harmfulWordsValue" : "harmfulWords",
-    "harmfulWordsLabel" : "Harmful Words",
-    "settingsValue" : "settings",
-    "settingsLabel" : "Settings",
-    "systemAdminsValue" : "systemAdmins",
-    "systemAdminsLabel" : "System Admins",
-    "nameError" : "Type name is required",
-    "userError" : "User is required",
-    "pageError" : "Pages is required",
-    "commentError" : "Comments is required",
-    "harmfulWordsError" : "Harmful words is required",
-    "settingsError" : "Settings is required",
-    "systemAdminsError" : "System Admins is required",
-    "editRole" : "Edit Role - ",
-    "addRole" : "Add Role - ",
-    "systemBackOffice" : "System Back Office",
-    "israelTitle" : "Israel Today Back Office",
-    "ittihadTitle" : "Ittihad Today Back Office",
-    "title" : "System Admins",
-    "typeName" : "Type name",
-    "section" : "Section",
-    "permission" : "Permission"
+  "roleType": {
+    "notApplicableValue": "not-applicable",
+    "notApplicableLabel": "Not Applicable",
+    "readWriteValue": "read-write",
+    "readWriteLabel": "Read & Write",
+    "readValue": "read",
+    "readLabel": "Read",
+    "usersValue": "users",
+    "usersLabel": "Users",
+    "pagesValue": "pages",
+    "pagesLabel": "Pages",
+    "commentsValue": "comments",
+    "commentsLabel": "Comments",
+    "harmfulWordsValue": "harmfulWords",
+    "harmfulWordsLabel": "Harmful Words",
+    "settingsValue": "settings",
+    "settingsLabel": "Settings",
+    "systemAdminsValue": "systemAdmins",
+    "systemAdminsLabel": "System Admins",
+    "nameError": "Type name is required",
+    "userError": "User is required",
+    "pageError": "Pages is required",
+    "commentError": "Comments is required",
+    "harmfulWordsError": "Harmful words is required",
+    "settingsError": "Settings is required",
+    "systemAdminsError": "System Admins is required",
+    "editRole": "Edit Role - ",
+    "addRole": "Add Role - ",
+    "systemBackOffice": "System Back Office",
+    "israelTitle": "Israel Today Back Office",
+    "ittihadTitle": "Ittihad Today Back Office",
+    "title": "System Admins",
+    "typeName": "Type name",
+    "section": "Section",
+    "permission": "Permission"
   },
-  "user":{
-     "title":"Users",
-     "user_list":{
-      "id":"Id",
-      "status":"Status",
-      "name":"Name",
-      "site":"site",
-      "comment":"Comment",
-      "lastseen":"lastseen",
-      "registration":"Registration",
-      "email":"Email",
-      "device":"Device",
-       "user_edit_form":{
-           "name":"Nickname" ,
-            "site":"Site"
-                
-       }
+  "user": {
+    "title": "Users",
+    "search": "Search",
+    "show": "show",
+    "user_list": {
+      "id": "Id",
+      "status": "Status",
+      "name": "Name",
+      "site": "site",
+      "comment": "Comment",
+      "lastseen": "lastseen",
+      "registration": "Registration",
+      "email": "Email",
+      "device": "Device"
+    },
+    "user_edit_form": {
+      "name": "Nickname",
+      "site": "Site",
+      "status": "Status",
+      "email": "Email",
+      "total_comments": "Total Comments",
+      "registration": "Registration",
+      "last_seen": "Last Seen",
+      "last_device": "Last Device",
+      "last_ip_address": "Last IP Address",
+      "approved_comments": "Approved Comments",
+      "not_approved_comments": "Not Approved Comments",
+      "pending_comments": "Pending Comments",
+      "save": "Save",
+      "row_iD": "Row ID",
+      "comments": "Comments",
+      "general_info": "General Info"
+    }
+  },
+  "profile": {
+    "header": "Profile",
+    "forms": {
+      "status": "Status",
+      "site": "Site",
+      "user_type": "User type",
+      "firstname": {
+        "lable": "First name",
+        "placehoder": "First name"
+      },
+      "lastname": {
+        "lable": "Last name",
+        "placehoder": "Last name"
+      },
+      "email": {
+        "lable": "Email",
+        "placehoder": "Email"
+      },
+      "phone": {
+        "lable": "Phone",
+        "placehoder": "Phone"
+      },
+      "password": {
+        "lable": "Password",
+        "placehoder": "Password"
+      },
+      "repeat_password": {
+        "lable": "Repeat password",
+        "placehoder": "Repeat password"
       }
+    }
+  },
+  "exel_sheetfilname": {
+    "system_admin": "system_admin",
+    "role": "role_type",
+    "user": "Users",
+    "harmful_word": "HamfulWord",
+    "page": "pages",
+    "comment": "Comments",
+    "commenthistorylog": "commentHistorylog",
+    "pagehistorylog": "pageshistorylog",
+    "sys_admin_list": "System_admin_list",
+    "sys_admin_type": "System_admin_type"
   }
 }

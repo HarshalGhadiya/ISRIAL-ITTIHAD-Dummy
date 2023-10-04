@@ -25,6 +25,7 @@ import Reachtextbox from "./Reachtextbox";
 import { useDispatch, useSelector } from "react-redux";
 import {
   settingPageGetData,
+  settingPageGetEmailOption,
   settingPagecreateData,
   settingPageupdateData,
 } from "../../redux/settingPageSlice";
@@ -35,9 +36,11 @@ import jsonData from "../../locales/en/translation.json";
 function Index() {
   const animatedComponents = makeAnimated();
   const dispatch = useDispatch();
+  //seting page edit data
   const data = useSelector(
     (state) => state?.root?.settingPage?.settingPageData
   );
+  //decalre intialvalue in state
   const [initialValues, setInitialValues] = useState({
     pages_notifications:
       data && data.length > 0 && JSON.parse(data[0]?.pages_notifications),
@@ -70,6 +73,7 @@ function Index() {
     newcommit_email_sub: data[0]?.newcommit_email_sub,
     newcommit_email_message: data[0]?.newcommit_email_message,
   });
+  //load componet when data is recive
   useEffect(() => {
     setInitialValues({
       pages_notifications:
@@ -156,14 +160,22 @@ function Index() {
   const systemadminEmail = useSelector(
     (state) => state?.root?.systemadmin?.systemadminData
   );
-  //save button login
+  const Emailoptions = useSelector(
+    (state) => state?.root?.settingPage?.getemailoption?.map((option) => ({
+      value: option.email,
+      label: option.email,
+    }))
+  );
+  //save button loding
   const buttonLoading = useSelector(
     (state) => state?.root?.settingPage?.loading
   );
+  console.log(buttonLoading,'button loding')
   //get time loading
   const getdataLoading = useSelector(
     (state) => state?.root?.settingPage?.getdataloding
   );
+  console.log(getdataLoading,'getdataLoading')
   //option for page notification
   const emailOptionsForPagen = systemadminEmail?.adminData?.map((option) => ({
     value: option.email,
@@ -189,6 +201,9 @@ function Index() {
   // Extract the read and write permissions directly
   const settingPagewritePermission =
     SettingPermissions?.permissions.write || false;
+    useEffect(()=>{
+      dispatch(settingPageGetEmailOption())
+    },[])
 
   return (
     <Fragment>
@@ -233,6 +248,7 @@ function Index() {
               onSubmit={handleSubmit}
             >
               {({ values, touched, errors, setFieldValue }) => (
+                console.log('values',values),
                 <Form>
                   <div className="d-flex justify-content-between align-items-center">
                     <h4 className="mb-0 ">
@@ -277,7 +293,7 @@ function Index() {
                           </Label>
                           <div>
                             <CreatableSelect
-                              disabled={!settingPagewritePermission}
+                               isDisabled={!settingPagewritePermission}
                               id="pages_notifications"
                               // defaultValue={data[0]?.pages_notifications}
                               name="pages_notifications"
@@ -289,7 +305,7 @@ function Index() {
                               components={animatedComponents}
                               className="react-select"
                               classNamePrefix="select"
-                              options={emailOptionsForPagen}
+                              options={Emailoptions}
                               isMulti
                               // value={values?.pages_notifications &&  values?.pages_notifications.length > 0 ? values.pages_notifications:[]}
                               value={
@@ -327,7 +343,7 @@ function Index() {
                             <CreatableSelect
                               id="comment_notifications"
                               color="white"
-                              disabled={!settingPagewritePermission}
+                               isDisabled={!settingPagewritePermission}
                               name="comment_notifications"
                               //isClearable={false}
                               theme={selectThemeColors}
@@ -335,7 +351,7 @@ function Index() {
                               components={animatedComponents}
                               className="react-select"
                               classNamePrefix="select"
-                              options={emailOptionsForcommentn}
+                              options={Emailoptions}
                               isMulti
                               value={
                                 values &&
@@ -381,7 +397,7 @@ function Index() {
                                   disabled={!settingPagewritePermission}
                                   type="text"
                                   id="top_title"
-                                  placeholder="Top title"
+                                  placeholder= {jsonData?.settingPage?.top_title}
                                   name="top_title"
                                   dir="rtl"
                                   {...field}
@@ -414,7 +430,7 @@ function Index() {
                                   disabled={!settingPagewritePermission}
                                   id="sub_title"
                                   {...field}
-                                  placeholder="Sub title"
+                                  placeholder={jsonData?.settingPage?.sub_title}
                                   name="sub_title"
                                   dir="rtl"
                                   onChange={(event) =>
@@ -446,7 +462,7 @@ function Index() {
                                   disabled={!settingPagewritePermission}
                                   id="url_parms"
                                   {...field}
-                                  placeholder=" URL for perms and privacy policy"
+                                  placeholder={jsonData?.settingPage?.url_parms}
                                   name="url_parms"
                                   onChange={(event) =>
                                     setFieldValue(
@@ -478,7 +494,7 @@ function Index() {
                                   id="google_client_id"
                                   {...field}
                                   name="google_client_id"
-                                  placeholder="Google signing client id"
+                                  placeholder={jsonData?.settingPage?.google_client_id}
                                   onChange={(event) =>
                                     setFieldValue(
                                       "google_client_id",

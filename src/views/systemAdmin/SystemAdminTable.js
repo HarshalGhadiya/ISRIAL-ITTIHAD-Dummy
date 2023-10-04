@@ -1,21 +1,21 @@
 // ** React Imports
-import { Fragment, useState, useEffect } from "react"
+import { Fragment, useState, useEffect } from "react";
 
 // Image import
-import Ittihadlogo from "../../../src/assets/images/logo/ittihad-logo.png"
-import Israellogo from "../../../src/assets/images/logo/Israel-logo.png"
-import CombineLogo from "../../../src/assets/images/logo/combinelogo2.png"
+import Ittihadlogo from "../../../src/assets/images/logo/ittihad-logo.png";
+import Israellogo from "../../../src/assets/images/logo/Israel-logo.png";
+import CombineLogo from "../../../src/assets/images/logo/combinelogo2.png";
 
 // ** Styles
-import "@styles/react/libs/tables/react-dataTable-component.scss"
-import isString from "lodash/isString"
+import "@styles/react/libs/tables/react-dataTable-component.scss";
+import isString from "lodash/isString";
 
 // ** Store & Actions
 // import { getData } from '../store'
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 
 // ** Third Party Components
-import ReactPaginate from "react-paginate"
+import ReactPaginate from "react-paginate";
 import {
   ChevronDown,
   ChevronUp,
@@ -24,10 +24,10 @@ import {
   Loader,
   Trash,
   Trash2,
-} from "react-feather"
-import DataTable from "react-data-table-component"
-import moment from "moment"
-import Swal from "sweetalert2"
+} from "react-feather";
+import DataTable from "react-data-table-component";
+import moment from "moment";
+import Swal from "sweetalert2";
 
 // ** Reactstrap Imports
 import {
@@ -49,80 +49,92 @@ import {
   NavItem,
   NavLink,
   Spinner,
-} from "reactstrap"
+} from "reactstrap";
 
-import { useDebouncedValue } from "../../utility/common/useDebouncedValue"
-import { handleKeyDown } from "../../utility/common/InputValidation"
-import { exportToExcel } from "../../utility/common/exportToExcel"
+import { useDebouncedValue } from "../../utility/common/useDebouncedValue";
+import { handleKeyDown } from "../../utility/common/InputValidation";
+import { exportToExcel } from "../../utility/common/exportToExcel";
 import {
-  SetRowPerPage,
+  // SetRowPerPage,
   SystemAdmindeleteapiCall,
   SystemAdminlistapiCall,
   updateTab,
-} from "../../redux/systemAdminSlice"
-import { Link, useNavigate } from "react-router-dom"
+} from "../../redux/systemAdminSlice";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   DeleteAdminRoleType,
   GetAdminRoleTypes,
-} from "../../redux/adminRoleTypeSlice"
-import jsonData from "../../locales/en/translation.json"
+} from "../../redux/adminRoleTypeSlice";
+import jsonData from "../../locales/en/translation.json";
+import { getDownloadadta } from "../../redux/exportdataExelslice";
+import { SetRowPerPage } from "../../redux/harmfulWordSlice";
 
 const SystemAdminTable = () => {
-  const userSite = localStorage.getItem("usersite")
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const userSite = localStorage.getItem("usersite");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userProgileData = useSelector(
     (state) => state?.root?.auth?.tokendata?.data?.data
-  )
+  );
 
   //Store Selection
-  const loading = useSelector((state) => state?.root?.systemadmin?.loading)
+  const loading = useSelector((state) => state?.root?.systemadmin?.loading);
   const LoadindRoltype = useSelector(
     (state) => state?.root?.adminRoleType?.loading
-  )
+  );
   const systemadminData = useSelector(
     (state) => state?.root?.systemadmin?.systemadminData
-  )
-  console.log(userProgileData, "systemadminData")
-  const rowsPerPages = useSelector(
-    (state) => state?.root?.systemadmin?.rowsPerPage
-  )
+  );
+  console.log(userProgileData, "systemadminData");
+  // const rowsPerPages = useSelector(
+  //   (state) => state?.root?.systemadmin?.rowsPerPage
+  // )
+  const rowperpage = useSelector(
+    (state) => state?.root?.harmfulWord?.rowsPerPage
+  );
   const systemadminTypeData = useSelector(
     (state) => state?.root?.adminRoleType?.adminRoleTypes
-  )
+  );
   const token = useSelector(
     (state) => state?.root?.auth?.tokendata?.data?.token
-  )
+  );
+  const exportdata = useSelector(
+    (state) => state?.root?.dowloadexeledata?.downloadPageData
+  );
+
   const PermissionArray =
     localStorage.getItem("userData") &&
-    JSON.parse(localStorage.getItem("userData"))?.permissions
+    JSON.parse(localStorage.getItem("userData"))?.permissions;
 
   // Find permissions for "systemAdmins"
   const systemAdminsPermissions = PermissionArray.find(
     (item) => item.section === "systemAdmins"
-  )
+  );
 
   // Extract the read and write permissions directly
-  const readPermission = systemAdminsPermissions?.permissions.read || false
-  const writePermission = systemAdminsPermissions?.permissions.write || false
+  const readPermission = systemAdminsPermissions?.permissions.read || false;
+  const writePermission = systemAdminsPermissions?.permissions.write || false;
 
-  const CombinePermission = readPermission && writePermission
+  const CombinePermission = readPermission && writePermission;
 
   // ** States
-  const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(rowsPerPages)
-  const [searchValue, setSearchValue] = useState("")
-  const [sortColumn, setSortColumn] = useState("row_id")
-  const [sortDirection, setSortDirection] = useState("desc")
-  const [sort, setsort] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(rowperpage);
+  const [searchValue, setSearchValue] = useState("");
+  const [sortColumn, setSortColumn] = useState("row_id");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [sort, setsort] = useState(true);
 
   // const [rSelected, setRSelected] = useState(1)
   const rSelected = useSelector(
     (state) => state?.root?.systemadmin?.SelectedTab
-  )
+  );
+  const loadingexportbutton = useSelector(
+    (state) => state?.root?.dowloadexeledata?.loading
+  );
+  const debouncedValue = useDebouncedValue(searchValue, 1000);
 
-  const debouncedValue = useDebouncedValue(searchValue, 1000)
 
   //useEffect API call
   useEffect(() => {
@@ -138,7 +150,7 @@ const SystemAdminTable = () => {
           navigate,
           token
         )
-      )
+      );
     } else {
       dispatch(
         GetAdminRoleTypes(
@@ -148,7 +160,7 @@ const SystemAdminTable = () => {
           sortColumn,
           sortDirection
         )
-      )
+      );
     }
   }, [
     debouncedValue,
@@ -157,7 +169,7 @@ const SystemAdminTable = () => {
     sortColumn,
     sortDirection,
     rSelected,
-  ])
+  ]);
 
   //System Admin list coloumn
   const serverSideColumns = [
@@ -268,7 +280,7 @@ const SystemAdminTable = () => {
     },
     {
       sortable: true,
-      name: "User type",
+      name: jsonData?.system_admin?.table?.header?.user_type,
       minWidth: "150px",
       selector: (row) => (
         <div>
@@ -277,7 +289,7 @@ const SystemAdminTable = () => {
             : "-"}
         </div>
       ),
-      sortField: "firstname",
+      sortField: "role",
     },
     {
       sortable: true,
@@ -329,7 +341,7 @@ const SystemAdminTable = () => {
       ),
       sortField: "updatedAt",
     },
-  ]
+  ];
 
   //System Admin Type coloumn
   const systemAdminTypeColumns = [
@@ -361,7 +373,7 @@ const SystemAdminTable = () => {
                 size={15}
                 color="#ea5556"
                 onClick={() => {
-                  handleRoleWarning(row)
+                  handleRoleWarning(row);
                 }}
               />
             </div>
@@ -417,7 +429,7 @@ const SystemAdminTable = () => {
       ),
       sortField: "updatedAt",
     },
-  ]
+  ];
 
   const handleWarning = (rowdata) => {
     Swal.fire({
@@ -438,10 +450,10 @@ const SystemAdminTable = () => {
           currentPage > 1 &&
           userSite == "systemBackOffice"
         ) {
-          setCurrentPage((pre) => pre - 1)
+          setCurrentPage((pre) => pre - 1);
         }
         // console.log(id)
-        const pages = searchValue !== "" ? 1 : currentPage
+        const pages = searchValue !== "" ? 1 : currentPage;
         // console.log(rowdata,'rowdata')
         dispatch(
           SystemAdmindeleteapiCall(
@@ -454,10 +466,10 @@ const SystemAdminTable = () => {
             sortDirection,
             systemadminData?.adminData?.length == 1
           )
-        )
+        );
       }
-    })
-  }
+    });
+  };
 
   const handleRoleWarning = (rowdata) => {
     Swal.fire({
@@ -474,11 +486,11 @@ const SystemAdminTable = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         if (systemadminTypeData?.roleData?.length == 1 && currentPage > 1) {
-          setCurrentPage((pre) => pre - 1)
+          setCurrentPage((pre) => pre - 1);
         }
 
         // console.log(id)
-        const pages = searchValue !== "" ? 1 : currentPage
+        const pages = searchValue !== "" ? 1 : currentPage;
         // console.log(rowdata,'rowdata')
         dispatch(
           DeleteAdminRoleType(
@@ -491,41 +503,41 @@ const SystemAdminTable = () => {
             sortDirection,
             systemadminTypeData?.roleData?.length == 1
           )
-        )
+        );
       }
-    })
-  }
+    });
+  };
 
   // ** Function to handle filter
   const handleFilter = (e) => {
-    setSearchValue(e.target.value)
+    setSearchValue(e.target.value);
     setTimeout(() => {
-      setCurrentPage(1)
-    }, 980)
-  }
+      setCurrentPage(1);
+    }, 980);
+  };
 
   // ** Function to handle Pagination and get data
   const handlePagination = (page) => {
-    setCurrentPage(page.selected + 1)
-  }
+    setCurrentPage(page.selected + 1);
+  };
 
   // ** Function to handle per page
   const handlePerPage = (e) => {
-    setRowsPerPage(parseInt(e.target.value))
-    setCurrentPage(1)
-    dispatch(SetRowPerPage(parseInt(e.target.value)))
-  }
+    setRowsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+    dispatch(SetRowPerPage(parseInt(e.target.value)));
+  };
 
   // ** Function for sorting data
   const handleSort = (column, sortDirection) => {
-    setsort(!sort)
-    setSortDirection(sortDirection)
-    setSortColumn(column?.sortField)
-  }
+    setsort(!sort);
+    setSortDirection(sortDirection);
+    setSortColumn(column?.sortField);
+  };
 
   // ** Custom Pagination
   const CustomPagination = () => {
-    const count = 10
+    const count = 10;
     //  Math.ceil(store.total / rowsPerPage)
     return (
       <ReactPaginate
@@ -554,15 +566,42 @@ const SystemAdminTable = () => {
           "pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1"
         }
       />
-    )
-  }
+    );
+  };
 
   const NewButtonHandler = () => {
     if (rSelected === 1) {
-      navigate("/system-admins/new")
+      navigate("/system-admins/new");
     } else {
-      navigate("/system-admins/new-type")
+      navigate("/system-admins/new-type");
     }
+  };
+
+  // Function to transform each item in the array
+  const transformApilistResponse = (apiItem) => {
+    return {
+      [jsonData?.system_admin?.table?.header?.id]: apiItem.row_id,
+      [jsonData?.system_admin?.table?.header?.status]: apiItem.status,
+      [jsonData?.system_admin?.table?.header?.site]: apiItem.site,
+      [jsonData?.system_admin?.table?.header?.fullname]: apiItem.fullName,
+      [jsonData?.system_admin?.table?.header?.user_type]: apiItem.userRole,
+      [jsonData?.system_admin?.table?.header?.email]: apiItem.email, // Extract the email and remove "mailto:"
+      [jsonData?.system_admin?.table?.header?.phone]: apiItem.phone,
+      [jsonData?.system_admin?.table?.header?.last_seen]: apiItem.lastSeen,
+      [jsonData?.system_admin?.table?.header?.update]: moment(apiItem.updatedAt).format("DD.MM.YYYY HH:mm"),
+      [jsonData?.system_admin?.table?.header?.updatedBy]:apiItem.updatedBy,
+
+    };
+  }
+
+  const transformApiRolelistResponse = (apiItem) => {
+    //const typename = jsonData?.system_admin?.table?.header?.update
+    return {
+      [jsonData?.system_admin?.table?.header?.id]: apiItem.row_id, 
+      [jsonData?.system_admin?.table?.header?.type_name]:apiItem?.role,
+      [jsonData?.system_admin?.table?.header?.update]: moment(apiItem?.updatedAt).format("DD.MM.YYYY HH:mm"),
+      [jsonData?.system_admin?.table?.header?.updatedBy] : apiItem?.updatedBy?.firstname + " " + apiItem?.updatedBy?.lastname
+    };
   }
 
   return (
@@ -592,14 +631,15 @@ const SystemAdminTable = () => {
             {jsonData?.new}
           </Button>
           <Button
-            onClick={() => {
-              exportToExcel(
-                rSelected == 1
-                  ? systemadminData?.adminData
-                  : systemadminTypeData?.roleData,
-                "xyz"
-              )
+            onClick={() =>{
+              
+              rSelected == 1
+                ? dispatch(getDownloadadta("admin", "", exportToExcel, jsonData.exel_sheetfilname.sys_admin_list, transformApilistResponse, navigate))
+                : dispatch(getDownloadadta("role", "", exportToExcel, jsonData.exel_sheetfilname.sys_admin_type, transformApiRolelistResponse, navigate));
+              // exportToExcel(transformedData ,rSelected === 1 ? jsonData.exel_sheetfilname.system_admin:jsonData.exel_sheetfilname.role)
             }}
+            
+            disabled={loadingexportbutton}
             color="primary"
             className={`rounded-0 ${
               CombinePermission ? "cursor-not-allowed" : "cursor-pointer"
@@ -607,6 +647,12 @@ const SystemAdminTable = () => {
             style={{ cursor: !CombinePermission ? "not-allowed" : "pointer" }}
             type="button"
           >
+            {loadingexportbutton && (
+              <Spinner
+                className="me-1 text-light spinner-border-sm"
+                size={10}
+              />
+            )}
             {jsonData?.export}
           </Button>
         </div>
@@ -620,9 +666,9 @@ const SystemAdminTable = () => {
                   <NavLink
                     active={rSelected === 1}
                     onClick={() => {
-                      setRowsPerPage(10)
-                      dispatch(SetRowPerPage(10))
-                      dispatch(updateTab(1))
+                      // setRowsPerPage(10)
+                      // dispatch(SetRowPerPage(10))
+                      dispatch(updateTab(1));
                     }}
                   >
                     {jsonData?.system_admin?.admin_list}
@@ -631,9 +677,9 @@ const SystemAdminTable = () => {
                 <NavItem>
                   <NavLink
                     onClick={() => {
-                      setRowsPerPage(10)
-                      dispatch(SetRowPerPage(10))
-                      dispatch(updateTab(2))
+                      // setRowsPerPage(10)
+                      // dispatch(SetRowPerPage(10))
+                      dispatch(updateTab(2));
                     }}
                     active={rSelected === 2}
                   >
@@ -654,7 +700,7 @@ const SystemAdminTable = () => {
                   id="sort-select"
                   value={rowsPerPage}
                   onChange={(e) => {
-                    handlePerPage(e)
+                    handlePerPage(e);
                   }}
                 >
                   {/* {/ <option value={5}>5</option> /} */}
@@ -715,7 +761,7 @@ const SystemAdminTable = () => {
         </>
       </Card>
     </Fragment>
-  )
-}
+  );
+};
 
-export default SystemAdminTable
+export default SystemAdminTable;

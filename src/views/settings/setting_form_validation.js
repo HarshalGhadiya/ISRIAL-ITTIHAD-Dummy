@@ -1,17 +1,19 @@
 import * as Yup from "yup";
+import jsonData from "../../locales/en/translation.json";
+
 
 const validationSchema = Yup.object().shape({
   pages_notifications: Yup.array()
-    .min(1, "Select at least one option")
-    .required("Page notifications is required"),
+    .min(1, jsonData?.error_msg?.pages_notifications?.min)
+    .required(jsonData?.error_msg?.pages_notifications?.required),
   comment_notifications: Yup.array()
-    .min(1, "Select at least one option")
-    .required("Comment notifications is required"),
+    .min(1, jsonData?.error_msg?.comment_notifications?.required)
+    .required(jsonData?.error_msg?.comment_notifications?.min),
   top_banner_image: Yup.mixed()
-    .required("Please Select An Image")
+    .required(jsonData?.error_msg?.image?.required)
     .test(
       "fileSize",
-      "File size is too Large Enter only 1 mb file",
+      jsonData?.error_msg?.image?.filesize,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -22,7 +24,7 @@ const validationSchema = Yup.object().shape({
     )
     .test(
       "fileType",
-      "Pleace Upload Only JPG,PNG,JPEG",
+      jsonData?.error_msg?.image?.filetype,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -35,10 +37,10 @@ const validationSchema = Yup.object().shape({
       } 
     ),
   logo_image: Yup.mixed()
-    .required("Please Select An Image")
+    .required(jsonData?.error_msg?.image?.required)
     .test(
       "fileSize",
-      "File Size Is Too Large Enter only 1 mb File",
+      jsonData?.error_msg?.image?.filesize,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -49,7 +51,7 @@ const validationSchema = Yup.object().shape({
     )
     .test(
       "fileType",
-      "pleace Upload only JPG,PNG,JPEG",
+      jsonData?.error_msg?.image?.filetype,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -62,10 +64,10 @@ const validationSchema = Yup.object().shape({
       } 
     ),
   login_image: Yup.mixed()
-    .required("Please Select An Image")
+    .required(jsonData?.error_msg?.image?.required)
     .test(
       "fileSize",
-      "File Size Is Too Large Enter only 1 mb file",
+      jsonData?.error_msg?.image?.filesize,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -76,7 +78,7 @@ const validationSchema = Yup.object().shape({
     )
     .test(
       "fileType",
-      "Pleace Upload only JPG,PNG,JPEG",
+      jsonData?.error_msg?.image?.filetype,
       (value) => {
         if (typeof value === "string") {
           return true;
@@ -88,21 +90,21 @@ const validationSchema = Yup.object().shape({
         }
       } 
     ),
-  top_title: Yup.string().required("Top Title Is Required"),
-  sub_title: Yup.string().required("Sub Title Is Required"),
+  top_title: Yup.string().required(jsonData?.error_msg?.top_title).trim(),
+  sub_title: Yup.string().required(jsonData?.error_msg?.sub_title).trim(),
   mustLogin: Yup.string(),
-  url_parms: Yup.string().required("URL For Perms And Privacy Policy Is Required"),
-  google_client_id: Yup.string().required("Google Client Id Is Required"),
+  url_parms: Yup.string().required(jsonData?.error_msg?.url_parms).trim(),
+  google_client_id: Yup.string().required(jsonData?.error_msg?.google_id).trim(),
   confirm_email_from: Yup.string()
-    .email("Invalid Email Address")
-    .required("From Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   confirm_email_reply: Yup.string()
-    .email("Invalid Email Address")
-    .required("Reply To Email Is Required"),
-  confrim_email_sub: Yup.string().required("Confirm Email Subject is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
+  confrim_email_sub: Yup.string().required(jsonData?.error_msg?.confirm_email_sub).trim(),
   footer_text: Yup.string().test(
     "required",
-    "Footer Text Is Required",(value)=>{
+    jsonData?.error_msg?.footer_title,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }
@@ -110,10 +112,10 @@ const validationSchema = Yup.object().shape({
         return true
       }
     }
-  ),
+  ).trim(),
   terms_privacy_policy: Yup.string().test(
     "required",
-    "Terms And Privacy Policy is Required",(value)=>{
+    jsonData?.error_msg?.terms_private,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }
@@ -124,7 +126,7 @@ const validationSchema = Yup.object().shape({
   ),
   confirm_email_message: Yup.string().test(
     "required",
-    "Confirm Email Message Is Required",(value)=>{
+    jsonData?.error_msg?.confirm_email,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }
@@ -134,15 +136,15 @@ const validationSchema = Yup.object().shape({
     }
   ),
   reset_email_from: Yup.string()
-    .email("Invalid Email Address")
-    .required("From Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   reset_email_reply: Yup.string()
-    .email("Invalid Email Address")
-    .required("Reply To Email Is Required"),
-  reset_email_sub: Yup.string().required("Reset Email Subject Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
+  reset_email_sub: Yup.string().required(jsonData?.error_msg?.reset_email_sub).trim(),
   reset_email_message: Yup.string().test(
     "required",
-    "Reset Email Message Is Required",(value)=>{
+    jsonData?.error_msg?.reset_email_message,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }
@@ -152,17 +154,17 @@ const validationSchema = Yup.object().shape({
     }
   ),
   newpage_email_from: Yup.string()
-    .email("Invalid Email Address")
-    .required("From Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   newpage_email_reply: Yup.string()
-    .email("Invalid Email Address")
-    .required("Reply To Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   newpage_email_sub: Yup.string().required(
-    "New Page Email Subject Is Required"
+    jsonData?.error_msg?.new_page_sub
   ),
   newpage_email_message: Yup.string().test(
     "required",
-    "Newpage Email Message  Is Required",(value)=>{
+    jsonData?.error_msg?.new_page_email_message,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }
@@ -173,17 +175,17 @@ const validationSchema = Yup.object().shape({
   ),
 
   newcommit_email_from: Yup.string()
-    .email("Invalid Email Address")
-    .required("From Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   newcommit_email_reply: Yup.string()
-    .email("Invalid Email Address")
-    .required("Reply To Email Is Required"),
+    .email(jsonData?.error_msg?.email?.invalid)
+    .required(jsonData?.error_msg?.email?.required).trim(),
   newcommit_email_sub: Yup.string().required(
-    "New Commit Email Subject Is Required"
-  ),
+    jsonData?.error_msg?.new_comment_sub
+  ).trim(),
   newcommit_email_message: Yup.string().test(
     "required",
-    "New comment Email Message Is Required",(value)=>{
+    jsonData?.error_msg?.new_comment_message,(value)=>{
       if(value === "<p><br></p>" || !value){
         return false
       }

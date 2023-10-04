@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { getCount } from "./commentSlice";
 
 
 //Slice initial state
@@ -10,6 +11,7 @@ const initialState = {
     loading: false,
     pageHistoryData:{},
     rowsPerPagePage:10,
+    addEditLoader:false
 };
 
 // get pages 
@@ -38,24 +40,25 @@ export const getPage = (navigate,currentPage, rowsPerPage, searchValue, sortDire
             dispatch(loadingflag(false));
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response?.data?.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
-        } 
-        if (err?.response?.status === 404) {
-            navigate('/error')
-        } 
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
         dispatch(loadingflag(false));
     }
 };
@@ -66,7 +69,7 @@ export const getSingalPage = (navigate,id) => async (dispatch) => {
     try {
         dispatch(loadingflag(true));
         const response = await axios.get(
-            `${import.meta.env.VITE_APP_API_URL}/comments/getCommentById/${id}`,
+            `${import.meta.env.VITE_APP_API_URL}/pages/getPage/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -75,28 +78,29 @@ export const getSingalPage = (navigate,id) => async (dispatch) => {
         );
 
         if (response.status === 200) {
-            dispatch(singalPageData(response.data.data[0]));
+            dispatch(singalPageData(response?.data?.data?.pageData[0]));
             dispatch(loadingflag(false));
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response?.data?.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
-        } 
-        if (err?.response?.status === 404) {
-            navigate('/error')
-        } 
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
         dispatch(loadingflag(false));
     }
 };
@@ -105,9 +109,9 @@ export const getSingalPage = (navigate,id) => async (dispatch) => {
 export const editPage = (navigate, data,id) => async (dispatch) => {
     const accessToken = localStorage.getItem("authtoken")
     try {
-        dispatch(loadingflag(true));
+        dispatch(setAddEditLoader(true));
         const response = await axios.put(
-            `${import.meta.env.VITE_APP_API_URL}/comments/updateCommentsData/${id}`,
+            `${import.meta.env.VITE_APP_API_URL}/pages/updatePage/${id}`,
                 data,        
             {
               headers: {
@@ -116,8 +120,9 @@ export const editPage = (navigate, data,id) => async (dispatch) => {
             }
           );
           if (response.status === 200) {
+              dispatch(getCount())
               navigate('/pages')
-              dispatch(loadingflag(false));
+              dispatch(setAddEditLoader(false));
               toast.success(response.data.message, {
                 position: "top-right",
                 autoClose: 2000,
@@ -130,22 +135,26 @@ export const editPage = (navigate, data,id) => async (dispatch) => {
               });
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response.data.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         }
-        dispatch(loadingflag(false));
+        dispatch(setAddEditLoader(false));
     }
 };
 
@@ -153,7 +162,7 @@ export const editPage = (navigate, data,id) => async (dispatch) => {
 export const addPage = (navigate, data) => async (dispatch) => {
     const accessToken = localStorage.getItem("authtoken")
     try {
-        dispatch(loadingflag(true));
+        dispatch(setAddEditLoader(true));
         const response = await axios.post(
             `${import.meta.env.VITE_APP_API_URL}/pages/createPage`,
             data,
@@ -165,7 +174,7 @@ export const addPage = (navigate, data) => async (dispatch) => {
           );
           if (response.status === 200) {
             navigate("/pages")
-            dispatch(loadingflag(false));
+            dispatch(setAddEditLoader(false));
             toast.success(response.data.message, {
                 position: "top-right",
                 autoClose: 2000,
@@ -178,22 +187,26 @@ export const addPage = (navigate, data) => async (dispatch) => {
               });
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response?.data?.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         }
-        dispatch(loadingflag(false));
+        dispatch(setAddEditLoader(false));
     }
 };
 
@@ -223,24 +236,25 @@ export const getHistoryPage = (navigate,currentPage, rowsPerPage, searchValue, s
             dispatch(loadingflag(false));
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response?.data?.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
-        } 
-        if (err?.response?.status === 404) {
-            navigate('/error')
-        } 
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
         dispatch(loadingflag(false));
     }
 };
@@ -265,10 +279,13 @@ const pageSlice = createSlice({
         setRowPerPagePage :(state, action) => {
             state.rowsPerPagePage = action.payload;
         },
+        setAddEditLoader:(state, action) => {
+            state.addEditLoader = action.payload;
+        },
     },
 });
 
-export const { loadingflag, pageData, singalPageData, pageHistory, setRowPerPagePage } =
+export const { loadingflag, pageData, singalPageData, pageHistory, setRowPerPagePage, setAddEditLoader} =
     pageSlice.actions;
 
 export default pageSlice.reducer;

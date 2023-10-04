@@ -3,6 +3,20 @@ import saveAs from 'file-saver';
 
 // Export data to Excel with bold header
 export const exportToExcel = (data, fileName) => {
+    // const result = []
+    // console.log(orderBy,"orderBy");
+    // // const columnOrder = data.map(item=> orderBy.map(i => ({i : item?.i})))
+    // for (let index = 0; index < data.length; index++) {
+    //     let newObj = {}
+    //     Object.keys(orderBy).map((key)=>{
+    //         newObj[orderBy[key]] = data[index]?.[key]
+    //     })
+    //     // orderBy.map(i=> {newObj[`${i}`]= data[index]?.[`${i}`]})
+    //     result.push(newObj)
+        
+    // }
+    // console.log("#" ,result)
+
     const worksheet = XLSX.utils.json_to_sheet(data);
 
     // Calculate column widths dynamically based on content length

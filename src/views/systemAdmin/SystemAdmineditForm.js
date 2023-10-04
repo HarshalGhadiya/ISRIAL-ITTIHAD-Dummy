@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { handleKeyDown,NumberhandleKeyPress } from "../../utility/common/InputValidation";
+import { handleKeyDown, NumberhandleKeyPress } from "../../utility/common/InputValidation";
 import jsonData from "../../locales/en/translation.json";
 // ** Third Party Components
 import Select from "react-select";
@@ -62,6 +62,7 @@ const SystemAdmineditForm = () => {
     label: "Active",
   });
   const [userTypeOptions, setUserTypeOptions] = useState([])
+  const [Usertype, setUsertype] = useState({});
 
   const loading = useSelector((state) => state?.root?.systemadmin?.loading);
   const AdminEditformdata = useSelector(
@@ -86,7 +87,7 @@ const SystemAdmineditForm = () => {
   // useEffect(() => {
   //   console.log(SytemuserTypeData, "SytemuserTypeData", selectedUsertype);
 
-    
+
   // }, [selectedUsertype]);
   //formik validation schema
   const validationSchema = Yup.object().shape({
@@ -100,6 +101,8 @@ const SystemAdmineditForm = () => {
       .email(jsonData?.error_msg?.email?.invalid)
       .required(jsonData?.error_msg?.email?.required).trim(),
     phone: Yup.string().required(jsonData?.error_msg?.phone?.required).trim(),
+    // .min(6, jsonData?.error_msg?.phone?.min)
+    //   .max(20, jsonData?.error_msg?.phone?.max),
 
     // Include "site" validation based on role
     ...(userSite == "systemBackOffice"
@@ -107,37 +110,39 @@ const SystemAdmineditForm = () => {
       : {}), // Include "site" validation if role is 1
   });
 
-  useEffect(()=>{
+  useEffect(() => {
 
 
     setUserTypeOptions(
 
-    SytemuserTypeData && SytemuserTypeData?.length > 0
-    ? SytemuserTypeData?.map((item) => ({
-        value: item._id,
-        label: item.role,
-      }))
-    : [])
-    setInitialValues({...initialValues , user_type: SytemuserTypeData && SytemuserTypeData?.length > 0
-      ? SytemuserTypeData?.map((item) => ({
+      SytemuserTypeData && SytemuserTypeData?.length > 0
+        ? SytemuserTypeData?.map((item) => ({
           value: item._id,
           label: item.role,
         }))
-      : [] })
+        : [])
+    setInitialValues({
+      ...initialValues, user_type: SytemuserTypeData && SytemuserTypeData?.length > 0
+        ? SytemuserTypeData?.map((item) => ({
+          value: item._id,
+          label: item.role,
+        }))
+        : []
+    })
 
 
-  },[SytemuserTypeData])
+  }, [SytemuserTypeData])
 
   //formik initial values
 
   const handleSubmit = (values, onSubmitProps) => {
     console.log(values, "values");
-    dispatch(SystemAdminEditcell({...values , user_type:  userSite == "systemBackOffice" ?values?.user_type[0]?.value :values?.user_type?.value }, navigate, id));
+    dispatch(SystemAdminEditcell({ ...values, user_type: userSite == "systemBackOffice" ? values?.user_type[0]?.value : values?.user_type?.value }, navigate, id));
     // navigate("/otp-code")
   };
 
-  const handleChange = (e)=>{
-    console.log("###" , e.target.name , e.target.value)
+  const handleChange = (e) => {
+    console.log("###", e.target.name, e.target.value)
   }
   const PermissionArray =
     localStorage.getItem("userData") &&
@@ -169,7 +174,7 @@ const SystemAdmineditForm = () => {
     }
   }, []);
   useEffect(() => {
-    if(AdminEditformdata){
+    if (AdminEditformdata) {
       setInitialValues({
         status: AdminEditformdata[0]?.status,
         user_type: AdminEditformdata[0]?.user_type,
@@ -182,17 +187,18 @@ const SystemAdmineditForm = () => {
           ? { site: AdminEditformdata[0]?.site }
           : {}), // Include "site" if role is 1
       });
-
+      setUsertype(AdminEditformdata[0]?.user_type)
     }
 
   }, [AdminEditformdata]);
   useEffect(() => {
     dispatch(SystemAdminsingleformdata(id, navigate));
   }, []);
-  useEffect(()=>{
+  useEffect(() => {
 
-  },[AdminEditformdata])
-  return (  
+  }, [AdminEditformdata])
+  console.log(initialValues, "initialValues", AdminEditformdata[0]?.user_type, userTypeOptions)
+  return (
     <>
       <head>
         <title>
@@ -200,299 +206,301 @@ const SystemAdmineditForm = () => {
           {userSite == "systemBackOffice"
             ? "System Back Office"
             : userSite == "israelBackOffice"
-            ? "Israel Today Back Office"
-            : "Ittihad Today Back Office"}
+              ? "Israel Today Back Office"
+              : "Ittihad Today Back Office"}
         </title>
       </head>
       <div>
-       {loading ? (<LoaderComponent></LoaderComponent>):(
-        <>
-           <CardHeader className=" mb-2 d-flex justify-content-between align-items-center">
-           <CardTitle tag="h4">System admins</CardTitle>
-           <Button
-             className=""
-             onClick={() => {
-               navigate("/system-admins");
-             }}
-             outline
-             color="primary"
-             type="button"
-           >
-             {jsonData?.back}
-           </Button>
-         </CardHeader>
- 
-         <Card>
-           <CardBody>
-             <Row>
-               <Formik
-                 initialValues={initialValues}
-                 enableReinitialize
-                 validationSchema={validationSchema}
-                 onSubmit={handleSubmit}
-                 onChange={handleChange}
+        {loading ? (<LoaderComponent></LoaderComponent>) : (
+          <>
+            <CardHeader className=" mb-2 d-flex justify-content-between align-items-center">
+              <CardTitle tag="h4">System admins</CardTitle>
+              <Button
+                className=""
+                onClick={() => {
+                  navigate("/system-admins");
+                }}
+                outline
+                color="primary"
+                type="button"
+              >
+                {jsonData?.back}
+              </Button>
+            </CardHeader>
 
-               >
-                 {({ values, isSubmitting, setFieldValue, errors }) => (
-                  // setFieldValue('user_type' ,userTypeOptions),
-                  console.log(values,'219'),
-                   <Form>
-                     <div className="d-flex justify-content-between align-items-center">
-                       <h4 className="mb-0">
-                         Row ID : {AdminEditformdata && AdminEditformdata[0] && AdminEditformdata[0]?.row_id}
-                       </h4>
-                       <Button
-                         type="submit"
-                         color="primary"
-                         className={!writePermission && "p-none"}
-                         disabled={loading}
-                       >
-                         {jsonData?.save}
-                         {loading && (
-                           <Spinner
-                             className="ms-1 text-light spinner-border-sm"
-                             size="sm"
-                           />
-                         )}
-                       </Button>
-                     </div>
-                     <hr />
-                     <div className="mb-1">
-                       <Row>
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.status}
-                           </Label>
-                           <Select
-                             name="status"
-                             theme={selectThemeColors}
-                             className="react-select"
-                             classNamePrefix="select"
-                             defaultValue={AdminEditformdata && AdminEditformdata?.length > 0 ? statusOptions?.find(
-                               (option) =>
-                                 option.value === AdminEditformdata[0]?.status
-                             ):[]}
-                             options={statusOptions}
-                             isClearable={false}
-                             onChange={(selectedOption) => {
-                               console.log(selectedOption, 'selectoption')
-                               setFieldValue("status", selectedOption.value);
-                               setselectedStatus(selectedOption);
-                             }}
-                           />
-                           <ErrorMessage
-                             name="status"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                         {userSite == "systemBackOffice" && (
-                           <Col md="3" sm="12" className="mb-1">
-                             <Label className="form-label">
-                               <em className="required-red">*</em>
-                               {jsonData?.system_admin?.forms?.site}
-                             </Label>
-                             <Select
-                               name="site"
-                               theme={selectThemeColors}
-                               className="react-select"
-                               classNamePrefix="select"
-                               // defaultValue={() => {
-                               //   const lable = AdminEditformdata[0]?.site ===
-                               //   "systemBackOffice"
-                               //     ? "System Admin"
-                               //     : AdminEditformdata[0]?.site ===
-                               //       "israelBackOffice"
-                               //     ? "Israel Back Office"
-                               //     : "Ittihad Back Office"
-                               //   return {
-                               //     value: AdminEditformdata[0]?.user_type,
-                               //     label:lable
-                                     
-                               //   };
-                               // }}
-                               defaultValue={AdminEditformdata && AdminEditformdata?.length > 0 ? siteOptions?.find(
-                                 (option) => 
-                                   option?.value === AdminEditformdata[0]?.site
-                               ):[]}
-                               //defaultValue={siteOptions.find(option => option.value === AdminEditformdata && AdminEditformdata.length>0&& AdminEditformdata[0]?.site)}
-                               options={siteOptions}
-                               isClearable={false}
-                               onChange={(selectedOption) => {
-                                 console.log(selectedOption, "select")
-                                 setselectedUsertype(selectedOption);
-                                 setFieldValue("site", selectedOption.value);
-                                 setInitialValues({...initialValues, site:  selectedOption?.value})
-                               //  setFieldValue("user_type", userTypeOptions[0].value)
-                                 dispatch(
-                                  SystemAdminDropdownRolelistapiCall(
-                                    selectedOption?.value,
-                                    navigate
-                                  )
-                                );
-                               }}
-                             />
-                             <ErrorMessage
-                               name="site"
-                               component="div"
-                               className="text-danger"
-                             />
-                           </Col>
-                         )}
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.user_type}
-                           </Label>
-                           {
-                            userSite == 'systemBackOffice' ?
-                            <Select
-                            name="user_type"
-                            theme={selectThemeColors}
-                            className="react-select"
-                            classNamePrefix="select"
-                            value={userTypeOptions[0]}
-                           //  defaultValue={userTypeOptions.find(
-                           //   (option) => 
-                           //     option?.value === AdminEditformdata[0]?.user_type
-                           // )}
-                            options={userTypeOptions}
-                            isClearable={false}
-                            onChange={(selectedOption) => {
-                              setFieldValue("user_type", selectedOption.value);
-                            }}
-                          />:<Select
-                          name="user_type"
-                          theme={selectThemeColors}
-                          className="react-select"
-                          classNamePrefix="select"
-                          // value={userTypeOptions.find(
-                          //   (option) => 
-                          //      option?.value === AdminEditformdata[0]?.user_type
-                          // )}
-                           defaultValue={AdminEditformdata && AdminEditformdata?.length > 0 ? userTypeOptions?.find(
-                           (option) => 
-                              option?.value === AdminEditformdata[0]?.user_type
-                         ):[]}
-                          options={userTypeOptions}
-                          isClearable={false}
-                          onChange={(selectedOption) => {
-                            setFieldValue("user_type", selectedOption);
-                          }}
-                        />
-                           }
-                          
-                           <ErrorMessage
-                             name="user_type"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                       </Row>
-                       <Row>
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.firstname?.lable}
-                           </Label>
-                           <Field name="firstname">
-                             {({ field }) => (
-                               <Input
-                                 onKeyPress={handleKeyDown}
-                                 type="text"
-                                 {...field}
-                                 placeholder="First Name"
-                               />
-                             )}
-                           </Field>
-                           <ErrorMessage
-                             name="firstname"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.lastname?.lable}
-                           </Label>
-                           <Field name="lastname">
-                             {({ field }) => (
-                               <Input
-                                 onKeyPress={handleKeyDown}
-                                 type="text"
-                                 {...field}
-                                 placeholder="Last Name"
-                               />
-                             )}
-                           </Field>
-                           <ErrorMessage
-                             name="lastname"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.email?.lable}
-                           </Label>
-                           <Field name="email">
-                             {({ field }) => (
-                               <Input
-                                 disabled={true}
-                                 onKeyPress={handleKeyDown}
-                                 type="text"
-                                 {...field}
-                                 placeholder="Email"
-                               />
-                             )}
-                           </Field>
-                           <ErrorMessage
-                             name="email"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                         <Col md="3" sm="12" className="mb-1">
-                           <Label className="form-label">
-                             <em className="required-red">*</em>
-                             {jsonData?.system_admin?.forms?.phone?.lable}
-                           </Label>
-                           <Field name="phone">
-                             {({ field }) => (
-                               <Input
-                               onKeyDown={(e) =>
-                                NumberhandleKeyPress(e, field)
+            <Card>
+              <CardBody>
+                <Row>
+                  <Formik
+                    initialValues={initialValues}
+                    enableReinitialize
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                    onChange={handleChange}
+
+                  >
+                    {({ values, isSubmitting, setFieldValue, errors }) => (
+                      // setFieldValue('user_type' ,userTypeOptions),
+                      console.log(values, '219'),
+                      <Form>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <h4 className="mb-0">
+                            Row ID : {AdminEditformdata && AdminEditformdata[0] && AdminEditformdata[0]?.row_id}
+                          </h4>
+                          <Button
+                            type="submit"
+                            color="primary"
+                            className={!writePermission && "p-none"}
+                            disabled={loading}
+                          >
+                            {jsonData?.save}
+                            {loading && (
+                              <Spinner
+                                className="ms-1 text-light spinner-border-sm"
+                                size="sm"
+                              />
+                            )}
+                          </Button>
+                        </div>
+                        <hr />
+                        <div className="mb-1">
+                          <Row>
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.status}
+                              </Label>
+                              <Select
+                                name="status"
+                                theme={selectThemeColors}
+                                className="react-select"
+                                classNamePrefix="select"
+                                defaultValue={AdminEditformdata && AdminEditformdata?.length > 0 ? statusOptions?.find(
+                                  (option) =>
+                                    option.value === AdminEditformdata[0]?.status
+                                ) : []}
+                                options={statusOptions}
+                                isClearable={false}
+                                onChange={(selectedOption) => {
+                                  console.log(selectedOption, 'selectoption')
+                                  setFieldValue("status", selectedOption.value);
+                                  setselectedStatus(selectedOption);
+                                }}
+                              />
+                              <ErrorMessage
+                                name="status"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                            {userSite == "systemBackOffice" && (
+                              <Col md="3" sm="12" className="mb-1">
+                                <Label className="form-label">
+                                  <em className="required-red">*</em>
+                                  {jsonData?.system_admin?.forms?.site}
+                                </Label>
+                                <Select
+                                  name="site"
+                                  theme={selectThemeColors}
+                                  className="react-select"
+                                  classNamePrefix="select"
+                                  // defaultValue={() => {
+                                  //   const lable = AdminEditformdata[0]?.site ===
+                                  //   "systemBackOffice"
+                                  //     ? "System Admin"
+                                  //     : AdminEditformdata[0]?.site ===
+                                  //       "israelBackOffice"
+                                  //     ? "Israel Back Office"
+                                  //     : "Ittihad Back Office"
+                                  //   return {
+                                  //     value: AdminEditformdata[0]?.user_type,
+                                  //     label:lable
+
+                                  //   };
+                                  // }}
+                                  defaultValue={AdminEditformdata && AdminEditformdata?.length > 0 ? siteOptions?.find(
+                                    (option) =>
+                                      option?.value === AdminEditformdata[0]?.site
+                                  ) : []}
+                                  //defaultValue={siteOptions.find(option => option.value === AdminEditformdata && AdminEditformdata.length>0&& AdminEditformdata[0]?.site)}
+                                  options={siteOptions}
+                                  isClearable={false}
+                                  onChange={(selectedOption) => {
+                                    console.log(selectedOption, "select")
+                                    setselectedUsertype(selectedOption);
+                                    setFieldValue("site", selectedOption.value);
+                                    setInitialValues({ ...initialValues, site: selectedOption?.value })
+                                    //  setFieldValue("user_type", userTypeOptions[0].value)
+                                    dispatch(
+                                      SystemAdminDropdownRolelistapiCall(
+                                        selectedOption?.value,
+                                        navigate
+                                      )
+                                    );
+                                  }}
+                                />
+                                <ErrorMessage
+                                  name="site"
+                                  component="div"
+                                  className="text-danger"
+                                />
+                              </Col>
+                            )}
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.user_type}
+                              </Label>
+                              {
+                                userSite == 'systemBackOffice' ?
+                                  <Select
+                                    name="user_type"
+                                    theme={selectThemeColors}
+                                    className="react-select"
+                                    classNamePrefix="select"
+                                    value={userTypeOptions[0]}
+                                    //  defaultValue={userTypeOptions.find(
+                                    //   (option) => 
+                                    //     option?.value === AdminEditformdata[0]?.user_type
+                                    // )}
+                                    options={userTypeOptions}
+                                    isClearable={false}
+                                    onChange={(selectedOption) => {
+                                      setFieldValue("user_type", selectedOption.value);
+                                    }}
+                                  /> : <Select
+                                    name="user_type"
+                                    theme={selectThemeColors}
+                                    className="react-select"
+                                    classNamePrefix="select"
+                                    // value={userTypeOptions.find(
+                                    //   (option) => 
+                                    //      option?.value === AdminEditformdata[0]?.user_type
+                                    // )}
+                                    value={Usertype && userTypeOptions?.find(
+                                      (option) =>
+                                        option?.value === Usertype
+                                    )}
+                                    options={userTypeOptions}
+                                    isClearable={false}
+                                    onChange={(selectedOption) => {
+                                      setUsertype(selectedOption)
+                                      setFieldValue("user_type", selectedOption);
+                                    }}
+                                  />
                               }
-                              type="text"
-                                 {...field}
-                                 placeholder="Phone"
-                                 maxLength={10}
-                               />
-                             )}
-                           </Field>
-                           <ErrorMessage
-                             name="phone"
-                             component="div"
-                             className="text-danger"
-                           />
-                         </Col>
-                       </Row>
-                     </div>
-                   </Form>
-                 )}
-               </Formik>
-             </Row>
-           </CardBody>
-         </Card>
-         <SystempasswordForm />
-         </>
-       ) 
+
+                              <ErrorMessage
+                                name="user_type"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.firstname?.lable}
+                              </Label>
+                              <Field name="firstname">
+                                {({ field }) => (
+                                  <Input
+                                    onKeyPress={handleKeyDown}
+                                    type="text"
+                                    {...field}
+                                    placeholder="First Name"
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage
+                                name="firstname"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.lastname?.lable}
+                              </Label>
+                              <Field name="lastname">
+                                {({ field }) => (
+                                  <Input
+                                    onKeyPress={handleKeyDown}
+                                    type="text"
+                                    {...field}
+                                    placeholder="Last Name"
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage
+                                name="lastname"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.email?.lable}
+                              </Label>
+                              <Field name="email">
+                                {({ field }) => (
+                                  <Input
+                                    disabled={true}
+                                    onKeyPress={handleKeyDown}
+                                    type="text"
+                                    {...field}
+                                    placeholder="Email"
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage
+                                name="email"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                            <Col md="3" sm="12" className="mb-1">
+                              <Label className="form-label">
+                                <em className="required-red">*</em>
+                                {jsonData?.system_admin?.forms?.phone?.lable}
+                              </Label>
+                              <Field name="phone">
+                                {({ field }) => (
+                                  <Input
+                                    onKeyDown={(e) =>
+                                      NumberhandleKeyPress(e, field)
+                                    }
+                                    type="text"
+                                    {...field}
+                                    placeholder="Phone"
+                                    // maxLength={20}
+                                    // minLength={6}
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage
+                                name="phone"
+                                component="div"
+                                className="text-danger"
+                              />
+                            </Col>
+                          </Row>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                </Row>
+              </CardBody>
+            </Card>
+            <SystempasswordForm />
+          </>
+        )
 
         }
-       
+
       </div>
     </>
   );

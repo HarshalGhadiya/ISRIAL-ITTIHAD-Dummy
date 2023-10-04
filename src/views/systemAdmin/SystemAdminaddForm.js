@@ -32,7 +32,6 @@ import {
   SystemAdminDropdownRolelistapiCall,
   SystemAdminformapiCall,
 } from "../../redux/systemAdminSlice"
-import LoaderComponent from "../../utility/common/LoaderComponent"
 import InputPasswordToggle from "@components/input-password-toggle"
 import { useEffect } from "react"
 import toast from "react-hot-toast";
@@ -55,7 +54,6 @@ const SystemAdminaddForm = () => {
   const userSite = useSelector(
     (state) => state?.root?.auth?.tokendata?.data?.data?.site
   )
-  console.log('usersite',userSite);
 
   // Find permissions for "systemAdmins"
   const PermissionArray =
@@ -91,7 +89,6 @@ const SystemAdminaddForm = () => {
     (state) => state?.root?.systemadmin?.sytemuserTypeData
   )
   
-
 
   // check permission for login user 
   useEffect(() => {
@@ -154,7 +151,11 @@ const SystemAdminaddForm = () => {
     email: Yup.string()
       .email(jsonData?.error_msg?.email?.invalid)
       .required(jsonData?.error_msg?.email?.required).trim(),
-    phone: Yup.string().required(jsonData?.error_msg?.phone?.required).trim(),
+    phone: Yup.string()
+      .required(jsonData?.error_msg?.phone?.required)
+      .trim(),
+      // .min(6, jsonData?.error_msg?.phone?.min)
+      // .max(20, jsonData?.error_msg?.phone?.max), 
     password: Yup.string()
       .required(jsonData?.error_msg?.password?.required)
       .matches(
@@ -187,7 +188,6 @@ const SystemAdminaddForm = () => {
       : {}), // Include "site" if role is 1
   }
 
-  console.log(formdata, '187')
 
   //form submit Handler
   const handleSubmit = (values, onSubmitProps) => {
@@ -403,7 +403,8 @@ const SystemAdminaddForm = () => {
                                 type="text"
                                 {...field}
                                 placeholder={jsonData?.system_admin?.forms?.phone?.placehoder}
-                                maxLength={10}
+                                // maxLength={20}
+                                // minLength={6}
                               />
                             )}
                           </Field>

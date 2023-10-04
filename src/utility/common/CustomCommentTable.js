@@ -15,6 +15,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import jsonData from "../../locales/en/translation.json"
 import { useDispatch } from 'react-redux'
 import { setRowPerPageComment, setRowPerPagePageComment } from '../../redux/commentSlice'
+import { SetRowPerPage } from '../../redux/harmfulWordSlice'
 
 const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue, searchValue, setRowsPerPage, rowsPerPage, setCurrentPage, currentPage, loading, checkPermission, tableFlag }) => {
   const [sort, setsort] = useState(true)
@@ -23,14 +24,14 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
   const serverSideColumns = [
     {
       name: "",
-      width: "85px",
+      width: "65px",
       allowOverflow: true,
       cell: (row) => {
         return (
           <div className="d-flex gap-1">
-            {/* <div onClick={() => navigate(`/comments/edit/${row?._id}`)} className={!checkPermission ? "cursor-not-allowed" : "cursor-pointer"}> */}
-            <Edit color="#e8b078" size={15} className="mr-1" />
-            {/* </div> */}
+            <div onClick={() =>checkPermission && navigate(`/comments/edit/${row?._id}`)} className={!checkPermission ? "cursor-not-allowed" : "cursor-pointer"}>
+              <Edit color="#e8b078" size={15} className="mr-1" />
+            </div>
           </div>
         )
       },
@@ -38,9 +39,9 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
     {
       sortable: true,
       name: <div>{jsonData.tableColum.id}</div>,
-      width: "80px",
+      width: "75px",
       selector: (row) => row.row_id,
-      sortField: "id",
+      sortField: "row_id",
     },
     {
       sortable: true,
@@ -48,15 +49,17 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
       width: "max-content",
       selector: (row) => (
         <div className="capitalize-text">
-          {row?.status == "approved" ? (
-            <Badge color="success" className="text-capitalize">
+         {row?.status == "approved" ? (
+              <Badge color="success" className="text-capitalize">
               {jsonData.tableColum.approved}
-            </Badge>
-          ) : (
-            <Badge color="danger" className="text-capitalize">
+              </Badge>
+            ) : row?.status == "pending" ? (
+              <Badge color="warning" className="text-capitalize">
               {jsonData.tableColum.pending}
-            </Badge>
-          )}
+              </Badge>
+            ) : (
+              <Badge color="danger">{jsonData.tableColum.notApproved}</Badge>
+            )}
         </div>
       ),
       sortField: "status",
@@ -64,16 +67,11 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
     {
       sortable: true,
       name: <div>{jsonData.tableColum.origin_site}</div>,
-      minWidth: "250px",
+      minWidth: "150px",
       selector: (row) => (
         <img
-          src={
-            row?.site == "ittihad-today"
-              ? Ittihadlogo
-              : row?.site == "israel-today"
-                ? Israellogo
-                : CombineLogo
-          }
+          className="img-fluid"
+          src={ row?.site == "ittihad-today" ? Ittihadlogo :  Israellogo}
           alt="logo"
         />
       ),
@@ -82,55 +80,55 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
     {
       sortable: true,
       name: <div>{jsonData.tableColum.user}</div>,
-      width: "100px",
-      selector: (row) => row.userName ? <span className="text-capitalize">{row.userName}</span> : "Anonymous User" ? row.name : <span className="text-capitalize">{row.name}</span>,
-      sortField: "user",
+      width: "150px",
+      selector: (row) => row.name ? <span className="text-capitalize">{row.name}</span> : "Anonymous User" ,
+      sortField: "name",
     },
     {
       sortable: true,
       name: <div>{jsonData.tableColum.page_name}</div>,
-      width: "145px",
-      selector: (row) => row.site === 'ittihad-today' ? row.pageData.ittihadPage : row.pageData.israelPage,
-      sortField: "pageName",
+      width: "140px",
+      selector: (row) => row.pageData,
+      sortField: "pageData",
     },
     {
       sortable: true,
       name: <div>{jsonData.tableColum.comment}</div>,
-      width: "128px",
+      width: "160px",
       selector: (row) => row.originalComment,
       sortField: "originalComment",
     },
     {
       sortable: true,
       name: <div>{jsonData.tableColum.submit_date}</div>,
-      width: "210px",
+      width: "150px",
       selector: (row) => moment(row?.createdAt).format("DD.MM.YYYY HH:mm"),
       sortField: "createdAt",
     },
     {
       sortable: true,
       name: <div >{jsonData.tableColum.approval_date}</div>,
-      width: "210px",
+      width: "160px",
       selector: (row) =>
         row?.approvalDate && row?.approvalDate != ""
           ? moment(row?.approvalDate).format("DD.MM.YYYY HH:mm")
-          : jsonData.tableColum.NA,
+          : "-",
       sortField: "approvalDate",
     },
     {
       sortable: true,
       name: <div>{jsonData.tableColum.approval_admin}</div>,
-      width: "210px",
+      width: "180px",
       selector: (row) => (
-        <div>
+        <div> 
           <div >
             {row?.updatedByUser
               ? <span className="text-capitalize">{row?.updatedByUser?.firstname}{" "}{row?.updatedByUser?.lastname}</span>
               : row?.updatedByAdmin
-                ? <span className="text-capitalize">{row?.updatedByAdmin?.firstname}{" "} {row?.updatedByAdmin?.lastname}</span> : jsonData.tableColum.NA}
+                ? <span className="text-capitalize">{row?.updatedByAdmin?.firstname}{" "} {row?.updatedByAdmin?.lastname}</span> : "-"}
           </div>
         </div>),
-      sortField: "approvalAdmin",
+      sortField: "updatedBy",
     },
   ]
 
@@ -144,11 +142,12 @@ const CustomCommentTable = ({ data, setSortDirection, setColumn, setSearchValue,
 
   // ** Function to handle per page
   const handlePerPage = (e) => {
-    if (tableFlag == "comment") {
-      dispatch(setRowPerPageComment(e.target.value))
-    } else if (tableFlag == "pageComment") {
-      dispatch(setRowPerPagePageComment(e.target.value))
-    }
+    // if (tableFlag == "comment") {
+    //   dispatch(setRowPerPageComment(e.target.value))
+    // } else if (tableFlag == "pageComment") {
+    //   dispatch(setRowPerPagePageComment(e.target.value))
+    // }
+    dispatch(SetRowPerPage(parseInt(e.target.value)))
     setRowsPerPage(e.target.value)
     setCurrentPage(1)
   }

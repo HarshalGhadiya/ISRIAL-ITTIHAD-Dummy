@@ -23,7 +23,7 @@ import { selectThemeColors } from "@utils"
 import { useDebouncedValue } from "../../utility/common/useDebouncedValue"
 import Highlighter from 'react-highlight-words';
 import "@styles/react/libs/tables/react-dataTable-component.scss";
-import { editComment, getSingalComment } from "../../redux/commentSlice"
+import { editComment, getSingalComment, loadingflag } from "../../redux/commentSlice"
 import moment from "moment"
 import translateText from "../../utility/common/TranslateText"
 import { getHarmfulWord } from "../../redux/harmfulWordSlice"
@@ -41,9 +41,12 @@ const EditComment = () => {
     const dispatch = useDispatch()
     const { id } = useParams()
     // ** States
-    
+
+    // const rowperpage = useSelector(
+    //     (state) => state?.root?.history?.rowsPerPageCommentHistory
+    // );
     const rowperpage = useSelector(
-        (state) => state?.root?.history?.rowsPerPageCommentHistory
+        (state) => state?.root?.harmfulWord?.rowsPerPage
     );
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(rowperpage);
@@ -53,8 +56,8 @@ const EditComment = () => {
     const singalCommentData = useSelector(
         (state) => state?.root?.comment?.singalComment
     );
-    const [status, setstatus] = useState(singalCommentData?.status);
-        
+    const [status, setstatus] = useState('');
+
     const data = useSelector(
         (state) => state?.root?.history?.historytData
     );
@@ -64,20 +67,24 @@ const EditComment = () => {
     const loader = useSelector(
         (state) => state?.root?.comment?.loading
     );
+    const harmfulloading = useSelector((state) => state?.root?.harmfulWord?.loading);
+
     const allHarmfulWord = useSelector(
         (state) => state?.root?.harmfulWord?.harmfulWordData
     );
 
     const debouncedQuery = useDebouncedValue(searchValue, 1000);
     const [inputText, setInputText] = useState('');
-    const [arabicText, setArabicText] = useState('');
-    const [hebrewText, setHebrewText] = useState('');
     const usersite = localStorage.getItem("usersite")
     const [badwords, setBadWords] = useState([]);
-
+    const [originComment, setoriginComment] = useState('');
+    const [convertedData, setConvertedData] = useState('');
+    const [editConvertedData, seteditConvertedData] = useState('');
+    const [highlighted, setHighlighted] = useState([]);
     const options = [
         { value: jsonData.activeValue, label: jsonData.activeLabel },
-        { value: jsonData.inActiveValue, label: jsonData.inActiveLabel },
+        { value: jsonData.inActiveValue, label: jsonData.inActiveLabel},
+        { value: jsonData.notApprovedValue, label: jsonData.notApprovedLabel},
     ]
 
     useEffect(() => {
@@ -103,21 +110,37 @@ const EditComment = () => {
             getHarmfulWord(navigate, '', '', '', '', '', false)
         );
     }, [dispatch, id])
-console.log(column)
+
     useEffect(() => {
         dispatch(getHistoryComment(navigate, currentPage, rowsPerPage, searchValue, sortDirection, column, id, "comments"))
     }, [dispatch, debouncedQuery, rowsPerPage, currentPage, sortDirection])
 
+    const textTranslate = async(singalCommentData) => {
+
+        const [convertedText,editedText] =  await Promise.all([translateText(singalCommentData?.originalComment, usersite == "israelBackOffice" ? 'ar' : 'iw'),translateText(singalCommentData?.updatedComment, usersite == "israelBackOffice" ? 'ar' : 'iw')])
+        setConvertedData(convertedText)
+        seteditConvertedData(editedText)
+        dispatch(loadingflag(false));
+    }
+
     useEffect(() => {
-        setBadWords(allHarmfulWord?.wordData?.map(item => item.word))
-    }, [allHarmfulWord])
+        if(allHarmfulWord?.wordData && singalCommentData) {
+            setBadWords(allHarmfulWord?.wordData?.map(item => item.word))
+            setoriginComment(singalCommentData?.originalComment)
+            setInputText(singalCommentData?.updatedComment && singalCommentData?.updatedComment)
+            setstatus(singalCommentData?.status)
+            setHighlighted(extractHighlightedWords(allHarmfulWord?.wordData?.map(item => item.word), singalCommentData?.originalComment))
+            textTranslate(singalCommentData)
+        }
+    }, [allHarmfulWord, singalCommentData])
 
     //find badwordArr
-    const extractHighlightedWords = () => {
-        const badwordArr = badwords?.filter((word) => {
+    const extractHighlightedWords = (bad, comment) => {
+        console.log(bad,comment)
+        const badwordArr = bad?.filter((word) => {
             const likePattern = _createSQLLikePattern(word);
             const regex = new RegExp(likePattern, 'i');
-            const isMatch = regex.test(singalCommentData?.originalComment);
+            const isMatch = regex.test(comment);
             if (isMatch) {
                 return word
             }
@@ -128,23 +151,19 @@ console.log(column)
         const escapedWord = word?.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')?.replace(/%/g, '.*');
         return `.*${escapedWord}.*`;
     }
-    const highlighted = extractHighlightedWords();
 
     const handleInputChange = async (e) => {
         const text = e.target.value;
         setInputText(text);
-        // Translate to Arabic
-        // const arabicText = await translateText(text, 'ar');
-        // setArabicText(arabicText);
 
-        // Translate to Hebrew
-        // const hebrewTranslation = await translateText(text, 'iw');
-        // setHebrewText(hebrewTranslation);
+        // Translate
+        const TranslationText = await translateText(text, usersite == "israelBackOffice" ? 'ar' : 'iw');
+        seteditConvertedData(TranslationText);
     };
 
     //edit comment
     const handleSave = () => {
-        if (inputText == '') {
+        if (inputText == singalCommentData?.updatedComment) {
             if (status == singalCommentData?.status) {
                 dispatch(editComment(navigate, {}, id))
             } else {
@@ -166,13 +185,12 @@ console.log(column)
     const updatedByAdmin = singalCommentData?.updatedByAdmin && singalCommentData?.updatedByAdmin?.firstname + " " + singalCommentData?.updatedByAdmin?.lastname
     const name = updatedByUser ? updatedByUser.charAt(0).toUpperCase() + updatedByUser.slice(1) :
         updatedByAdmin ? updatedByAdmin.charAt(0).toUpperCase() + updatedByAdmin.slice(1) : ""
-
     return (
         <>
             <head>
                 <title>{jsonData.title.Edit_comment} - {usersite == "israelBackOffice" ? jsonData.sitename.israel : jsonData.sitename.ittihad}</title>
             </head>
-            {loader ? <LoaderComponent /> : <><CardHeader className="mb-1">
+            {loader || harmfulloading ? <LoaderComponent /> : <><CardHeader className="mb-1">
                 <Row>
                     <Col
                         className="d-flex align-items-center justify-content-sm-start mt-sm-0 mt-1"
@@ -216,30 +234,22 @@ console.log(column)
                                         theme={selectThemeColors}
                                         className="react-select"
                                         classNamePrefix="select"
-                                        defaultValue={options.find((option) => option.value === singalCommentData?.status)}
+                                        value={options.find((option) => option.value === status)}
                                         options={options}
                                         isClearable={false}
                                         onChange={(e) => {
                                             setstatus(e.value)
                                         }}
                                     />
-                                    {
-                                        console.log(options?.find((option) => option?.value === singalCommentData?.status))
-
-                                    }
                                 </Col>
                                 <Col className="col-md-2">
                                     <Label className="form-label" for="nameVerticalIcons">
                                         {jsonData.Comment.origin_site}
                                     </Label>
-                                    <img
+                                    <img className="img-fluid"
                                         type="image"
                                         disabled={true}
-                                        src={singalCommentData?.site == "ittihad-today"
-                                            ? Ittihadlogo
-                                            : singalCommentData?.site == "israel-today"
-                                                ? Israellogo
-                                                : CombineLogo}
+                                        src={singalCommentData?.site == "ittihad-today" ? Ittihadlogo : Israellogo}
                                     />
                                 </Col>
 
@@ -250,7 +260,7 @@ console.log(column)
                                     <Input
                                         type="text"
                                         disabled={true}
-                                        value={singalCommentData?.createdAt}
+                                        value={moment(singalCommentData?.createdAt).format("DD.MM.YYYY HH:mm")}
                                     />
                                 </Col>
                                 <Col className="col-md-2">
@@ -260,7 +270,7 @@ console.log(column)
                                     <Input
                                         type="text"
                                         disabled={true}
-                                        value={singalCommentData?.approvalDate}
+                                        value={moment(singalCommentData?.approvalDate).format("DD.MM.YYYY HH:mm")}
                                     />
                                 </Col>
                                 <Col className="col-md-2">
@@ -285,12 +295,13 @@ console.log(column)
                                         value={singalCommentData?.site === 'ittihad-today' ? singalCommentData?.pageData?.ittihadPage : singalCommentData?.pageData?.israelPage}
                                     />
                                 </Col>
-                                <Col className="col-md-3 d-flex justify-content-center align-items-end">
-                                    <Button type="button" color="primary">{jsonData.Comment.israel_button}</Button>
+                                
+                                <Col className="col-md-3 d-flex align-items-end">
+                                    <Button type="button" color="primary" onClick={() => window.open(singalCommentData?.pageData?.isrealUrl, "_blank")} disabled={!singalCommentData?.pageData?.isrealUrl}>{jsonData.Comment.israel_button}</Button>
                                 </Col>
+                                <Col className="col-md-3 d-flex align-items-end">
+                                    <Button type="button" color="primary" onClick={() => window.open(singalCommentData?.pageData?.ittihadUrl, "_blank")} disabled={!singalCommentData?.pageData?.ittihadUrl}>{jsonData.Comment.itthad_button}</Button>
 
-                                <Col className="col-md-3 d-flex justify-content-start align-items-end">
-                                    <Button type="button" color="primary">{jsonData.Comment.itthad_button}</Button>
                                 </Col>
                             </Row>
                             <hr />
@@ -302,28 +313,29 @@ console.log(column)
                             <hr />
                             <Row className="mt-1">
                                 <Col className="col-md-8">
-                                    <Row>
+                                    <Row className="mt-1">
                                         <Col className="col-md-6">
                                             <Label className="form-label" for="nameVerticalIcons">
                                                 {usersite == "israelBackOffice" ? jsonData.Comment.comment_hebrew : jsonData.Comment.comment_arbic}
                                             </Label>
-                                            <div contentEditable="false"
+                                            <div
                                                 style={{
                                                     border: '1px solid #ccc',
-                                                    padding: '5px',
-                                                    minHeight: '70px',
+                                                    padding: '7px',
+                                                    height: '70px',
                                                     outline: 'none',
                                                     resize: 'none',
                                                     overflow: 'auto',
                                                     background: '#efefef',
-                                                    direction: "rtl"
+                                                    direction: "rtl",
+                                                    borderRadius: '0.357rem',
                                                 }}
                                             >
                                                 <Highlighter
                                                     highlightClassName="YourHighlightClass"
                                                     searchWords={badwords}
                                                     autoEscape={true}
-                                                    textToHighlight={singalCommentData?.originalComment}
+                                                    textToHighlight={originComment}
                                                     highlightStyle={{ background: 'yellow' }}
                                                 />
                                             </div>
@@ -336,7 +348,7 @@ console.log(column)
                                                 type="textarea"
                                                 disabled={true}
                                                 style={{ direction: "rtl" }}
-                                                value={singalCommentData?.originalComment}
+                                                value={convertedData}
                                             />
                                         </Col>
                                     </Row>
@@ -347,7 +359,7 @@ console.log(column)
                                             </Label>
                                             <Input
                                                 type="textarea"
-                                                // value={inputText}
+                                                value={inputText}
                                                 onKeyDown={handleKeyDown}
                                                 style={{ direction: "rtl" }}
                                                 onChange={handleInputChange}
@@ -361,7 +373,7 @@ console.log(column)
                                                 type="textarea"
                                                 style={{ direction: "rtl" }}
                                                 disabled={true}
-                                                value={usersite == "israelBackOffice" ? arabicText : hebrewText}
+                                                value={editConvertedData}
                                             />
                                         </Col>
                                     </Row>
@@ -369,26 +381,32 @@ console.log(column)
                                 <Col className="col-md-4">
                                     <Row>
                                         <Col className="col-md-6"><h4>{jsonData.harmful_word.header}</h4><hr />
-                                            <ul>
-                                                {
-                                                    highlighted?.map((word, index) => (
-                                                        <>
-                                                            <li key={index}>
-                                                                {word}
-                                                            </li>
-                                                        </>
-                                                    ))
-                                                }
-                                            </ul>
+                                            <div style={{ height: "150px", overflowY: "auto" }}>
+                                                <ul className="list-unstyled">
+                                                    {
+                                                        highlighted?.map((word, index) => (
+                                                            <>
+                                                                <li key={index}>
+                                                                    {word}
+                                                                </li>
+                                                            </>
+                                                        ))
+                                                    }
+                                                </ul>
+                                            </div>
                                         </Col>
-                                        <Col className="col-md-6"><h4>{jsonData.Comment.userInfo}</h4><hr /></Col>
-                                    </Row>
+                                        <Col className="col-md-6"><h4>{jsonData.Comment.userInfo}</h4><hr />
+                                            <div >{singalCommentData?.name}</div>
+                                            <div >{singalCommentData?.email}</div>
+                                            <div >{singalCommentData?.ip}</div>
+                                        </Col>
+                                        </Row>
                                 </Col>
                             </Row>
                             <hr />
                         </Form>
                     </CardBody>
-                    <HistoryLogTable data={data} setCurrentPage={setCurrentPage} setRowsPerPage={setRowsPerPage} setSearchValue={setSearchValue} setColumn={setColumn} setSortDirection={setSortDirection} rowsPerPage={rowsPerPage} currentPage={currentPage} searchValue={searchValue} module='comments' />
+                    <HistoryLogTable id={id} data={data} setCurrentPage={setCurrentPage} setRowsPerPage={setRowsPerPage} setSearchValue={setSearchValue} setColumn={setColumn} setSortDirection={setSortDirection} rowsPerPage={rowsPerPage} currentPage={currentPage} searchValue={searchValue} module='comments'exelsheetname={'commenthistoryLogs'} />
                 </Card> </>}
         </>
     )

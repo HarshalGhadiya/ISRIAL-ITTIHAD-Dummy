@@ -13,6 +13,7 @@ import ReactPaginate from "react-paginate";
 import { ChevronDown, Edit, Edit3, Loader, Trash2 } from "react-feather";
 import DataTable from "react-data-table-component";
 import moment from "moment";
+import jsonData from "../../locales/en/translation.json";
 // ** Reactstrap Imports
 import {
   Card,
@@ -38,6 +39,8 @@ import { userList } from "../../redux/userSlice";
 import Ittihadlogo from "../../../src/assets/images/logo/ittihad-logo.png";
 import Israellogo from "../../../src/assets/images/logo/Israel-logo.png";
 import CombineLogo from "../../../src/assets/images/logo/combinelogo2.png";
+import { getDownloadadta } from "../../redux/exportdataExelslice";
+import { SetRowPerPage } from "../../redux/harmfulWordSlice";
 
 const UserTable = () => {
   // ** Store Vars
@@ -45,13 +48,26 @@ const UserTable = () => {
   const navigate = useNavigate();
 
   const loading = useSelector((state) => state?.root?.users?.loading);
+  const loadingexportbutton = useSelector(
+    (state) => state?.root?.dowloadexeledata?.loading
+  );
   const users = useSelector((state) => state?.root?.users?.UserListData);
+  console.log('users',users);
+  // const rowperpage = useSelector((state) => state?.root?.users?.rowsPerPage);
+  const rowperpage = useSelector(
+    (state) => state?.root?.harmfulWord?.rowsPerPage
+  );
+  const exportdata = useSelector(
+    (state) => state?.root?.dowloadexeledata?.downloadPageData
+  );
+  console.log("rowper page", rowperpage);
   // ** States
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(rowperpage);
   const [searchValue, setSearchValue] = useState("");
-  const [sortColumn, setSortColumn] = useState("updatedAt");
+  const [sortColumn, setSortColumn] = useState("row_id");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [sort, setsort] = useState(true);
 
   const debouncedValue = useDebouncedValue(searchValue, 1000);
   const PermissionArray =
@@ -65,8 +81,8 @@ const UserTable = () => {
   // Extract the read and write permissions directly
   const UsersPagewritePermission = UsersPermissions?.permissions.write || false;
   const readPermission = UsersPermissions?.permissions.read || false;
-  const combindpermisttion= UsersPagewritePermission && readPermission 
-
+  const combindpermisttion = UsersPagewritePermission && readPermission;
+  console.log("permission", readPermission);
   //useEffect API call
   useEffect(() => {
     const pages = searchValue !== "" ? 1 : currentPage;
@@ -75,6 +91,21 @@ const UserTable = () => {
       userList(pages, rowsPerPage, searchValue, sortColumn, sortDirection)
     );
   }, [debouncedValue, currentPage, rowsPerPage, sortColumn, sortDirection]);
+
+  const transformResponse = (apiItem) => {
+    return {
+      [jsonData?.user?.user_list?.id]: apiItem.row_id, 
+      [jsonData?.user?.user_list?.status]:apiItem?.status,
+      [jsonData?.user?.user_list?.name]:apiItem.name,
+      [jsonData?.user?.user_list?.site]:apiItem.site,
+      [jsonData?.user?.user_list?.comment]: apiItem.totalComments,
+      [jsonData?.user?.user_list?.lastseen]: moment(apiItem.lastSeen).format("DD.MM.YYYY HH:mm"),
+      [jsonData?.user?.user_list?.registration]: moment(apiItem?.updatedAt).format("DD.MM.YYYY HH:mm"),
+      [jsonData?.user?.user_list?.email]:apiItem.email,
+      [jsonData?.user?.user_list?.device]:apiItem.device,
+    };
+  }
+  // const transformedData = exportdata.map(transformResponse)
 
   // ** Table Server Side Column
   const serverSideColumns = [
@@ -90,12 +121,13 @@ const UserTable = () => {
             size={15}
             className="mr-1"
             style={{
-                cursor: !combindpermisttion
-                  ? "not-allowed"
-                  : 'pointer',
-              }}
-              disabled={!combindpermisttion}
-            onClick={() => navigate(`/edit-users/${row?._id}`)}
+              cursor: readPermission ? "pointer" : "not-allowed",
+            }}
+            onClick={() => {
+              if (readPermission) {
+                navigate(`/users/edit-users/${row?._id}`);
+              }
+            }}
           />
         </div>
       ),
@@ -103,14 +135,20 @@ const UserTable = () => {
     },
     {
       sortable: true,
-      name: "id",
+      name: (
+        <div className="text-capitalize">{jsonData?.user?.user_list?.id}</div>
+      ),
       width: "80px",
       selector: (row) => row?.row_id,
       sortField: "row_id",
     },
     {
       sortable: true,
-      name: "Status",
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.status}
+        </div>
+      ),
       width: "150px",
       selector: (row) => (
         <div className="capitalize-text">
@@ -129,24 +167,26 @@ const UserTable = () => {
     },
     {
       sortable: true,
-      name: "Name",
+      name: (
+        <div className="text-capitalize">{jsonData?.user?.user_list?.name}</div>
+      ),
       width: "110px",
-      selector: (row) => row?.name,
-      sortField: "Name",
+      selector: (row) => (
+        <div className="text-capitalize">{row?.name}</div>
+      ),
+      sortField: "name",
     },
     {
       sortable: true,
-      name: "Site",
+      name: (
+        <div className="text-capitalize">{jsonData?.user?.user_list?.site}</div>
+      ),
       width: "200px",
       selector: (row) => (
         <img
           className="img-fluid"
           src={
-            row?.site == "ittihadBackOffice"
-              ? Ittihadlogo
-              : row?.site == "israelBackOffice"
-              ? Israellogo
-              : CombineLogo
+            row?.site=='israel-today'?Israellogo : Ittihadlogo
           }
           alt="logo"
         />
@@ -156,43 +196,66 @@ const UserTable = () => {
     },
     {
       sortable: true,
-      name: "Comment",
-      width: "250px",
-      selector: (row) => 15, // row?.comment,
-      sortField: "Comment",
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.comment}
+        </div>
+      ),
+      width: "150px",
+      selector: (row) => row.totalComments, // row?.comment,
+      sortField: "totalComments",
     },
     {
       sortable: true,
-      name: "Last seen",
-      width: "250px",
-      selector: (row) =>
-      (<div>
-          {row?.lastSeen  && row?.lastSeen != ""
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.lastseen}
+        </div>
+      ),
+      width: "200px",
+      selector: (row) => (
+        <div>
+          {row?.lastSeen && row?.lastSeen != ""
             ? moment(row?.lastSeen).format("DD.MM.YYYY HH:mm")
             : "-"}
-        </div>),
-      sortField: "lastseen",
+        </div>
+      ),
+      sortField: "lastSeen",
     },
     {
       sortable: true,
-      name: "Registration",
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.registration}
+        </div>
+      ),
       width: "250px",
-      selector: (row) => row?.createdAt,
-      sortField: "Registration",
+      selector: (row) => moment(row?.createdAt).format("DD.MM.YYYY HH:mm"),
+      sortField: "createdAt",
     },
     {
       sortable: true,
-      name: "Email",
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.email}
+        </div>
+      ),
       width: "250px",
       selector: (row) => row?.email,
-      sortField: "Email",
+      sortField: "email",
     },
     {
       sortable: true,
-      name: "Device",
-      width: "250px",
-      selector: (row) => row.device,
-      sortField: "Device",
+      name: (
+        <div className="text-capitalize">
+          {jsonData?.user?.user_list?.device}
+        </div>
+      ),
+      width: "200px",
+      selector: (row) => (
+        <div className="text-capitalize">{row?.device && row?.device != "" ? row?.device : "-"}</div>
+      ),
+      sortField: "device",
     },
   ];
 
@@ -212,10 +275,13 @@ const UserTable = () => {
   // ** Function to handle per page
   const handlePerPage = (e) => {
     setRowsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+    dispatch(SetRowPerPage(parseInt(e.target.value)));
   };
 
   // ** Function for sorting data
   const handleSort = (column, sortDirection) => {
+    setsort(!sort);
     setSortDirection(sortDirection);
     setSortColumn(column?.sortField);
     // console.log(column, sortDirection,'sortDirection')
@@ -231,7 +297,7 @@ const UserTable = () => {
         previousLabel={""}
         nextLabel={""}
         breakLabel="..."
-        pageCount={Math.ceil(users?.pageCount) || 1}
+        pageCount={Math.ceil(users?.totalPage) || 1}
         marginPagesDisplayed={2}
         pageRangeDisplayed={2}
         activeClassName="active"
@@ -270,30 +336,38 @@ const UserTable = () => {
             className="d-flex align-items-center justify-content-sm-start mt-sm-0 mt-1"
             sm="8"
           >
-            <CardTitle tag="h4">Users</CardTitle>
+            <CardTitle tag="h4">{jsonData?.user?.title}</CardTitle>
           </Col>
           <Col
             className="d-flex align-items-center justify-content-sm-end mt-sm-0 mt-1"
             sm="4"
           >
-             <Button
-              onClick={() => {
-                exportToExcel(data?.data, "xyz");
+            <Button
+              //onClick={downloadfile}
+              onClick={()=>{
+                dispatch(getDownloadadta("user", "", exportToExcel, jsonData?.user?.title, transformResponse, navigate))
               }}
               color="primary"
               className="rounded-0"
               type="button"
-            >
-              Export XLS
+             disabled={loadingexportbutton}
+            > 
+              {loadingexportbutton && (
+                <Spinner
+                  className="me-1 text-light spinner-border-sm"
+                  size={10}
+                />
+              )}
+              {jsonData?.export}
             </Button>
           </Col>
         </Row>
-        </CardHeader>
+      </CardHeader>
       <Card>
         <Row className="mx-0 mt-1 mb-50">
           <Col sm="6">
             <div className="d-flex align-items-center">
-              <Label for="sort-select">show</Label>
+              <Label for="sort-select">{jsonData?.user?.show}</Label>
               <Input
                 className="dataTable-select"
                 type="select"
@@ -315,7 +389,7 @@ const UserTable = () => {
             sm="6"
           >
             <Label className="me-1" for="search-input">
-              Search
+              {jsonData?.user?.search}
             </Label>
             <Input
               className="dataTable-filter"
@@ -343,6 +417,7 @@ const UserTable = () => {
               sortIcon={<ChevronDown size={10} />}
               paginationComponent={CustomPagination}
               onSort={handleSort}
+              defaultSortAsc={sort}
               sortServer
               data={users?.users}
             />

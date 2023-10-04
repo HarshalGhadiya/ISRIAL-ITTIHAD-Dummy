@@ -1,6 +1,6 @@
 // ** React Imports
 import { Fragment, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 // ** Reactstrap Imports
 import { TabContent, TabPane, Nav, NavItem, NavLink, CardHeader, Row, Col, CardTitle, Button, Card } from 'reactstrap'
@@ -11,6 +11,7 @@ import { getComment } from '../../../redux/commentSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDebouncedValue } from '../../../utility/common/useDebouncedValue'
 import jsonData from "../../../locales/en/translation.json"
+import toast from "react-hot-toast";
 
 const index = () => {
   // ** State
@@ -18,9 +19,13 @@ const index = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+  const { id } = useParams()
 
   // ** States
-  const rowperpage = useSelector((state) => state?.root?.comment?.rowsPerPagePageComment)
+  // const rowperpage = useSelector((state) => state?.root?.comment?.rowsPerPagePageComment)
+  const rowperpage = useSelector(
+    (state) => state?.root?.harmfulWord?.rowsPerPage
+  );
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(rowperpage)
   const [searchValue, setSearchValue] = useState("")
@@ -31,6 +36,27 @@ const index = () => {
   const debouncedQuery = useDebouncedValue(searchValue, 1000)
   const usersite = localStorage.getItem("usersite")
 
+  useEffect(() => {
+    //for access route
+    const userData = JSON.parse(localStorage.getItem("userData"))
+    const permissionArr = userData?.permissions?.filter((section) => section?.section == "comments")
+    const checkPermission = permissionArr[0]?.permissions?.write && permissionArr[0]?.permissions?.read
+    if (!checkPermission) {
+      navigate('/comments')
+      toast.error(jsonData.errormsg, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [dispatch])
+
+
   // ** Get data on mount
   useEffect(() => {
     dispatch(
@@ -40,7 +66,8 @@ const index = () => {
         rowsPerPage,
         searchValue,
         sortDirection,
-        column
+        column,
+        id, ""
       )
     )
   }, [dispatch, debouncedQuery, rowsPerPage, currentPage, sortDirection])
@@ -52,6 +79,9 @@ const index = () => {
   }
   return (
     <Fragment>
+      <head>
+        <title>{id ? jsonData.title.editPage : jsonData.title.addPage} - {usersite == "israelBackOffice" ? jsonData.sitename.israel : jsonData.sitename.ittihad}</title>
+      </head>
       <CardHeader className="mb-1">
         <Row>
           <Col

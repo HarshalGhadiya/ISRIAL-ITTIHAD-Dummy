@@ -28,64 +28,132 @@ import { getHarmfulWord } from "../../../redux/harmfulWordSlice"
 import HistoryLogTable from "../../../utility/common/HistoryLogTable"
 import jsonData from "../../../locales/en/translation.json"
 import { getHistoryComment } from "../../../redux/historyLogSlice"
-import { addPage } from "../../../redux/pageSlice"
+import { addPage, editPage, getSingalPage } from "../../../redux/pageSlice"
+import moment from "moment"
+import toast from "react-hot-toast"
 
 const MainPageInfo = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { id } = useParams()
   // ** States
+  // const rowperpage = useSelector(
+  //   (state) => state?.root?.history?.rowsPerPagePageHistory
+  // );
   const rowperpage = useSelector(
-    (state) => state?.root?.history?.rowsPerPagePageHistory
+    (state) => state?.root?.harmfulWord?.rowsPerPage
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(rowperpage);
   const [searchValue, setSearchValue] = useState("");
   const [column, setColumn] = useState("row_id");
   const [sortDirection, setSortDirection] = useState("desc");
-  const data = useSelector(
-    (state) => state?.root?.comment?.commentHistoryData
-  );
+  const [admin, setAdmin] = useState('');
+
+
   const loading = useSelector(
-    (state) => state?.root?.comment?.loading
+    (state) => state?.root?.page?.loading
   );
+  const loader = useSelector(
+    (state) => state?.root?.page?.addEditLoader
+  );
+  const data = useSelector(
+    (state) => state?.root?.history?.historytData
+  );
+  const singalPageData = useSelector((state) => state?.root?.page?.singalPage)
+
   const debouncedQuery = useDebouncedValue(searchValue, 1000);
   const usersite = localStorage.getItem("usersite")
 
   const options = [
     { value: jsonData.Page.activeValue, label: jsonData.Page.activeLabel },
-    { value: jsonData.Page.inactiveValue, label: jsonData.Page.inactiveLabel },
+    { value: jsonData.Page.pendingValue, label: jsonData.Page.pendingLabel },
+    { value: jsonData.Page.notApprovedValue, label: jsonData.Page.notApprovedLabel },
   ]
   //formik initial values
   const initialValues = {
-    status: "",
-    pageName: "",
-    pageUrl: "",
+    status: id ? usersite == "israelBackOffice" ? singalPageData?.israelStatus : singalPageData?.ittihadStatus : '',
+    pageName: id ? (usersite == "israelBackOffice" ? singalPageData?.israelPage : singalPageData?.ittihadPage) : "",
+    pageUrl: id ? (usersite == "israelBackOffice" ? singalPageData?.isrealUrl : singalPageData?.ittihadUrl) : "",
   }
 
+  //validation
   const validationSchema = Yup.object().shape({
     status: Yup.string().required(jsonData.Page.statusErr).trim(),
     pageName: Yup.string().required(jsonData.Page.pageErr).trim(),
-    pageUrl: Yup.string().required(jsonData.Page.pageUrlErr).trim(),
+    pageUrl: Yup.string().url(jsonData.Page.urlFormatErr).required(jsonData.Page.pageUrlErr).trim(),
   })
 
   useEffect(() => {
     if (id) {
-      // dispatch(getSingalComment(navigate, id))
-      dispatch(
-        getHarmfulWord(navigate, '', '', '', '', '', false)
-      );
+      dispatch(getSingalPage(navigate, id))
     }
   }, [dispatch, id])
 
+  //get history log
   useEffect(() => {
-    // dispatch(getHistoryComment(navigate, currentPage, rowsPerPage, searchValue, sortDirection, column,id, "pages"))
+    if (id) {
+      dispatch(getHistoryComment(navigate, currentPage, rowsPerPage, searchValue, sortDirection, column, id, "pages"))
+    }
   }, [dispatch, debouncedQuery, rowsPerPage, currentPage, sortDirection])
 
+  //set admin name
+  useEffect(() => {
+    if (usersite === 'israelBackOffice') {
+      if (singalPageData?.israelUpdatedByAdmin) {
+        setAdmin(singalPageData?.israelUpdatedByAdmin?.firstname ?? '' + ' ' + singalPageData?.israelUpdatedByAdmin?.lastname ?? '')
+      } else if (singalPageData?.israelUpdatedByUser) {
+        setAdmin(singalPageData?.israelUpdatedByUser?.firstname ?? '' + ' ' + singalPageData?.israelUpdatedByUser?.lastname ?? '')
+      }
+    } else if (usersite === 'ittihadBackOffice') {
+      if (singalPageData?.ittihadUpdatedByAdmin) {
+        setAdmin(singalPageData?.ittihadUpdatedByAdmin?.firstname ?? '' + ' ' + singalPageData?.ittihadUpdatedByAdmin?.lastname ?? '')
+      } else if (singalPageData?.ittihadUpdatedByUser) {
+        setAdmin(singalPageData?.ittihadUpdatedByUser?.firstname ?? '' + ' ' + singalPageData?.ittihadUpdatedByUser?.lastname ?? '')
+      }
+    }
+  }, [singalPageData])
+
+  //capitale admin name
+  const capitalizeName = (name) => {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+  const capitalAdminName = capitalizeName(admin)
+
+
+  //copy function
+  const handleCopyLink = async () => {
+    try {
+      await window?.navigator?.clipboard?.writeText(usersite == "israelBackOffice" ? singalPageData?.israelPageScript : singalPageData?.ittihadPageScript);
+      toast?.success("Coppied script")
+    } catch (error) {
+      console.error("Error copying URL:", error);
+    }
+  };
+
+  //view page
+  const handleViewPage = (url) => {
+    window.open(url, "_blank")
+  }
+
+  //add edit page
   const handleSubmit = (values) => {
-    // console.log(values)
-    values.embeddedScript = "<script async src='https://comment.iti.com/js?id=UA-181032834-1'></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments)};} gtag('js', new Date()); gtag('config', 'UA-181032834-1'); </script>"
+    if (id && id != undefined) {
+      const changedFields = Object.keys(values).filter(
+        (field) => values[field] !== initialValues[field]
+      );
+      const changedFieldValues = {};
+      changedFields.forEach((field) => {
+        changedFieldValues[field] = values[field];
+      });
+      dispatch(editPage(navigate, changedFieldValues, id))
+    } else {
+      values.embeddedScript = "<script async src='https://comment.iti.com/js?id=UA-181032834-1'></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments)};} gtag('js', new Date()); gtag('config', 'UA-181032834-1'); </script>"
       dispatch(addPage(navigate, values))
+    }
   }
 
   return (
@@ -97,14 +165,14 @@ const MainPageInfo = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ values, isSubmitting, setFieldValue }) => (
+            {({isValid, values, isSubmitting, setFieldValue }) => (
               <>
                 <Form>
                   <CardBody className="pb-0">
                     <div className="d-flex justify-content-between align-items-center">
-                      <h4 className="mb-0"> {id && `${jsonData.roomId}:-${data?.row_id}`}</h4>
-                      <Button color="primary" disabled={loading} type="submit">
-                        {loading && (
+                      <h4 className="mb-0"> {id && `${jsonData.roomId}:-${singalPageData?.row_id}`}</h4>
+                      <Button color="primary" disabled={loader} type="submit">
+                        {loader && (
                           <Spinner
                             className="me-1 text-light spinner-border-sm"
                             size={10}
@@ -124,7 +192,7 @@ const MainPageInfo = () => {
                           theme={selectThemeColors}
                           className="react-select"
                           classNamePrefix="select"
-                          // defaultValue={selectedStatus}
+                          defaultValue={id && options.find((option) => option.value == (usersite == "israelBackOffice" ? singalPageData?.israelStatus : singalPageData?.ittihadStatus))}
                           options={options}
                           isClearable={false}
                           onChange={(selectedOption) => {
@@ -144,7 +212,7 @@ const MainPageInfo = () => {
                         <Input
                           type="text"
                           disabled={true}
-                          value={id && 30}
+                          value={id && (usersite == "israelBackOffice" ? singalPageData?.israelCommentCount : singalPageData?.ittihadCommentCount)}
                         />
                       </Col>
 
@@ -155,7 +223,7 @@ const MainPageInfo = () => {
                         <Input
                           type="text"
                           disabled={true}
-                          value={id && "2023-09-13T05:13:04.113Z"}
+                          value={id && (usersite == "israelBackOffice" ? singalPageData?.israelPublishDate && moment(singalPageData?.israelPublishDate).format("DD.MM.YYYY HH:mm") : singalPageData?.ittihadPublishDate && moment(singalPageData?.ittihadPublishDate).format("DD.MM.YYYY HH:mm"))}
                         />
                       </Col>
                       <Col className="col-md-2">
@@ -165,7 +233,7 @@ const MainPageInfo = () => {
                         <Input
                           type="text"
                           disabled={true}
-                          value={ id && "Admin Name"}
+                          value={id && capitalAdminName}
                         />
                       </Col>
                     </Row>
@@ -204,15 +272,21 @@ const MainPageInfo = () => {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
+                        
+                      </Col>
+                      <Col className="col-md-2 d-flex justify-content-start align-items-end">
+                        <Button type="button" color="primary" onClick={() => handleViewPage(values.pageUrl)}
+                          disabled={!values.pageUrl || !validationSchema.fields.pageUrl.isValidSync(values.pageUrl)}
+                        >
+                          {jsonData.Page.viewPage}
+                        </Button>
+                      </Col>
+                      <Col lg="12">
+                      <ErrorMessage
                           name='pageUrl'
                           component="div"
                           className="text-danger"
                         />
-
-                      </Col>
-                      <Col className="col-md-2 d-flex justify-content-start align-items-end">
-                        <Button type="button" color="primary">{jsonData.Page.viewPage} </Button>
                       </Col>
                     </Row>
                     {id && id != undefined && <><Row className="mt-1">
@@ -223,11 +297,11 @@ const MainPageInfo = () => {
                         <Input
                           type="textarea"
                           disabled={true}
-                          value={"<Scrip></Scrip>"}
+                          value={id && (usersite == "israelBackOffice" ? singalPageData?.israelPageScript : singalPageData?.ittihadPageScript)}
                         />
                       </Col>
                       <Col className="col-md-2 d-flex justify-content-start align-items-end">
-                        <Button type="button" color="primary">{jsonData.Page.copyScript} </Button>
+                        <Button type="button" color="primary" onClick={handleCopyLink}>{jsonData.Page.copyScript} </Button>
                       </Col>
                     </Row>
                       <hr />
@@ -237,7 +311,7 @@ const MainPageInfo = () => {
               </>
             )}
           </Formik>
-          {id && id != undefined && <HistoryLogTable data={data} setCurrentPage={setCurrentPage} setRowsPerPage={setRowsPerPage} setSearchValue={setSearchValue} setColumn={setColumn} setSortDirection={setSortDirection} rowsPerPage={rowsPerPage} currentPage={currentPage} searchValue={searchValue} module="pages" />}
+          {id && id != undefined && <HistoryLogTable id={id} data={data} setCurrentPage={setCurrentPage} setRowsPerPage={setRowsPerPage} setSearchValue={setSearchValue} setColumn={setColumn} setSortDirection={setSortDirection} rowsPerPage={rowsPerPage} currentPage={currentPage} searchValue={searchValue} module="pages" exelsheetname={'pagehistoryLogs'} />}
         </Card> </>}
     </>
   )

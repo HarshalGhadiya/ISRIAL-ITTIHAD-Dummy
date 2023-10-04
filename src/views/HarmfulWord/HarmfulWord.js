@@ -1,13 +1,13 @@
 // ** React Imports
-import { Fragment, useState, useEffect, memo } from "react"
-import "@styles/react/libs/tables/react-dataTable-component.scss"
+import { Fragment, useState, useEffect, memo } from "react";
+import "@styles/react/libs/tables/react-dataTable-component.scss";
 
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 
 // ** Third Party Components
-import { ChevronDown, ChevronUp, Edit, Trash } from "react-feather"
-import DataTable from "react-data-table-component"
-import { exportToExcel } from "../../utility/common/exportToExcel"
+import { ChevronDown, ChevronUp, Edit, Trash } from "react-feather";
+import DataTable from "react-data-table-component";
+import { exportToExcel } from "../../utility/common/exportToExcel";
 
 // ** Reactstrap Imports
 import {
@@ -20,37 +20,56 @@ import {
   Col,
   Button,
   Spinner,
-} from "reactstrap"
-import { SetRowPerPage, deleteHarmfulWord, getHarmfulWord } from "../../redux/harmfulWordSlice"
-import CustomPagination from "../../utility/common/CustomPagination"
-import { useNavigate } from "react-router"
-import { useDebouncedValue } from "../../utility/common/useDebouncedValue"
-import { Link } from "react-router-dom"
-import Swal from "sweetalert2"
-import store from "../../redux/store"
-import LoaderComponent from "../../utility/common/LoaderComponent"
-import moment from "moment"
-import jsonData from "../../locales/en/translation.json"
+} from "reactstrap";
+import {
+  SetRowPerPage,
+  deleteHarmfulWord,
+  getHarmfulWord,
+} from "../../redux/harmfulWordSlice";
+import CustomPagination from "../../utility/common/CustomPagination";
+import { useNavigate } from "react-router";
+import { useDebouncedValue } from "../../utility/common/useDebouncedValue";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import store from "../../redux/store";
+import LoaderComponent from "../../utility/common/LoaderComponent";
+import moment from "moment";
+import jsonData from "../../locales/en/translation.json";
+import { getDownloadadta } from "../../redux/exportdataExelslice";
 
 const HarmfulWord = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   // ** States
-  const rowperpage = useSelector((state) => state?.root?.harmfulWord?.rowsPerPage)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(rowperpage)
-  const [searchValue, setSearchValue] = useState("")
-  const [column, setColumn] = useState("")
-  const [sortDirection, setSortDirection] = useState("desc")
-  const [sort, setsort] = useState(true)
-  const data = useSelector((state) => state?.root?.harmfulWord?.harmfulWordData)
-  const loading = useSelector((state) => state?.root?.harmfulWord?.loading)
-  const debouncedQuery = useDebouncedValue(searchValue, 1000)
+  const rowperpage = useSelector(
+    (state) => state?.root?.harmfulWord?.rowsPerPage
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(rowperpage);
+  const [searchValue, setSearchValue] = useState("");
+  const [column, setColumn] = useState("");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [sort, setsort] = useState(true);
+  const data = useSelector(
+    (state) => state?.root?.harmfulWord?.harmfulWordData
+  );
+  const loading = useSelector((state) => state?.root?.harmfulWord?.loading);
+  const debouncedQuery = useDebouncedValue(searchValue, 1000);
   //for permition
-  const usersite = localStorage.getItem("usersite")
-  const userData = JSON.parse(localStorage.getItem("userData"))
-  const permissionArr = userData?.permissions?.filter((section) => section?.section == "harmfulWords")
-  const checkPermission = permissionArr[0]?.permissions?.write && permissionArr[0]?.permissions?.read
+  const usersite = localStorage.getItem("usersite");
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const permissionArr = userData?.permissions?.filter(
+    (section) => section?.section == "harmfulWords"
+  );
+  const exportdata = useSelector(
+    (state) => state?.root?.dowloadexeledata?.downloadPageData
+  );
+
+  const checkPermission =
+    permissionArr[0]?.permissions?.write && permissionArr[0]?.permissions?.read;
+  const loadingexportbutton = useSelector(
+    (state) => state?.root?.dowloadexeledata?.loading
+  );
   // ** Get data on mount
   useEffect(() => {
     dispatch(
@@ -63,8 +82,8 @@ const HarmfulWord = () => {
         column,
         true
       )
-    )
-  }, [dispatch, debouncedQuery, rowsPerPage, currentPage, sortDirection])
+    );
+  }, [dispatch, debouncedQuery, rowsPerPage, currentPage, sortDirection]);
 
   const handleWarning = (id) => {
     Swal.fire({
@@ -81,7 +100,7 @@ const HarmfulWord = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         if (data?.wordData?.length == 1 && currentPage > 1) {
-          setCurrentPage((pre) => pre - 1)
+          setCurrentPage((pre) => pre - 1);
         }
         store.dispatch(
           deleteHarmfulWord(
@@ -94,10 +113,10 @@ const HarmfulWord = () => {
             column,
             data?.wordData?.length == 1
           )
-        )
+        );
       }
-    })
-  }
+    });
+  };
 
   const serverSideColumns = [
     {
@@ -107,17 +126,28 @@ const HarmfulWord = () => {
       cell: (row) => {
         return (
           <div className={`d-flex gap-1`}>
-            <div onClick={() => navigate(`/harmful-words/edit/${row?._id}`)} className={!checkPermission ? "cursor-not-allowed" : "cursor-pointer"}>
+            <div
+              onClick={() =>
+                checkPermission && navigate(`/harmful-words/edit/${row?._id}`)
+              }
+              className={
+                !checkPermission ? "cursor-not-allowed" : "cursor-pointer"
+              }
+            >
               <Edit color="#e8b078" size={15} className="mr-1" />
             </div>
 
-            <div className={!checkPermission ? "cursor-not-allowed" : "cursor-pointer"}>
-              <span onClick={() => handleWarning(row._id)}>
+            <div
+              className={
+                !checkPermission ? "cursor-not-allowed" : "cursor-pointer"
+              }
+            >
+              <span onClick={() => checkPermission && handleWarning(row._id)}>
                 <Trash color="#ea5556" size={15} />
               </span>
             </div>
           </div>
-        )
+        );
       },
     },
     {
@@ -134,7 +164,9 @@ const HarmfulWord = () => {
     },
     {
       sortable: true,
-      name: <div className="text-capitalize">{jsonData.tableColum.Updated}</div>,
+      name: (
+        <div className="text-capitalize">{jsonData.tableColum.Updated}</div>
+      ),
       width: "250px",
       selector: (row) => (
         <div>
@@ -143,42 +175,70 @@ const HarmfulWord = () => {
               ? moment(row?.updatedAt).format("DD.MM.YYYY HH:mm")
               : jsonData.tableColum.NA}
           </div>
-          <div >
-            {row?.updatedByUser
-              ?<span className="text-capitalize">{row?.updatedByUser?.firstname+" " +row?.updatedByUser?.lastname}</span>
-              : <span className="text-capitalize">{row?.updatedByAdmin?.firstname+ " " +row?.updatedByAdmin?.lastname}</span>}
+          <div>
+            {row?.updatedByUser ? (
+              <span className="text-capitalize">
+                {row?.updatedByUser?.firstname +
+                  " " +
+                  row?.updatedByUser?.lastname}
+              </span>
+            ) : (
+              <span className="text-capitalize">
+                {row?.updatedByAdmin?.firstname +
+                  " " +
+                  row?.updatedByAdmin?.lastname}
+              </span>
+            )}
           </div>
         </div>
       ),
     },
-  ]
+  ];
 
   // ** Function to handle filter
   const handleFilter = (e) => {
-    setSearchValue(e.target.value)
+    setSearchValue(e.target.value);
     setTimeout(() => {
-      setCurrentPage(1)
-    }, 980)
-  }
+      setCurrentPage(1);
+    }, 980);
+  };
 
   // ** Function to handle per page
   const handlePerPage = (e) => {
-    dispatch(SetRowPerPage(e.target.value))
-    setRowsPerPage(e.target.value)
-    setCurrentPage(1)
-  }
+    dispatch(SetRowPerPage(parseInt(e.target.value)));
+    setRowsPerPage(e.target.value);
+    setCurrentPage(1);
+  };
 
   // ** Function to handle sorting
   const TableSort = (column, sortDirection) => {
-    setsort(!sort)
-    setColumn(column)
-    setSortDirection(sortDirection)
-  }
+    setsort(!sort);
+    setColumn(column);
+    setSortDirection(sortDirection);
+  };
+//   useEffect(() => {
+//     dispatch(getDownloadadta("harmfullWord", ""))
+// }, []);
+
+const transformResponse = (apiItem) => {
+  return {
+    [jsonData.tableColum.id]: apiItem.row_id, 
+    [jsonData.tableColum.Word]:apiItem?.word,
+    [jsonData.tableColum.Updated]:apiItem.updatedAt,
+    [jsonData?.system_admin?.table?.header?.updatedBy]:apiItem.fullName
+  };
+}
+const transformedData = exportdata.map(transformResponse)
 
   return (
     <Fragment>
       <head>
-        <title> {usersite == "israelBackOffice" ? jsonData.title.israelharmfulword : jsonData.title.ittihadharmfulword}</title>
+        <title>
+          {" "}
+          {usersite == "israelBackOffice"
+            ? jsonData.title.israelharmfulword
+            : jsonData.title.ittihadharmfulword}
+        </title>
       </head>
 
       <Row>
@@ -202,16 +262,25 @@ const HarmfulWord = () => {
                   onClick={() => navigate("/harmful-words/add")}
                   disabled={!checkPermission}
                 >
-                 {jsonData.new}
+                  {jsonData.new}
                 </Button>
                 <Button
-                  onClick={() => {
-                    exportToExcel(data, "xyz")
+                  onClick={()=>{
+                    // exportToExcel(transformedData,jsonData?.exel_sheetfilname?.harmful_word)
+                    dispatch(getDownloadadta("harmfullWord", "", exportToExcel, jsonData?.exel_sheetfilname?.harmful_word, transformResponse, navigate))
+                  
                   }}
                   color="primary"
                   className="rounded-0"
                   type="button"
+                  disabled={loadingexportbutton}
                 >
+                  {/* {loadingexportbutton && (
+                    <Spinner
+                      className="me-1 text-light spinner-border-sm"
+                      size={10}
+                    />
+                  )} */}
                   {jsonData.export}
                 </Button>
               </Col>
@@ -282,7 +351,7 @@ const HarmfulWord = () => {
         </Col>
       </Row>
     </Fragment>
-  )
-}
+  );
+};
 
-export default HarmfulWord
+export default HarmfulWord;

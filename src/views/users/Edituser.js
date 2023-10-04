@@ -14,11 +14,13 @@ import {
   NavItem,
   Nav,
   NavLink,
+  Spinner,
 } from "reactstrap";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { handleKeyDown } from "../../utility/common/InputValidation";
 import toast from "react-hot-toast";
+import jsonData from "../../locales/en/translation.json"
 // ** Third Party Components
 import { getComment } from '../../redux/commentSlice'
 import Select from "react-select";
@@ -31,6 +33,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { userEditdata, userEditsingledata } from "../../redux/userSlice";
 import { useDebouncedValue } from "../../utility/common/useDebouncedValue";
 import CustomCommentTable from "../../utility/common/CustomCommentTable";
+import LoaderComponent from "../../utility/common/LoaderComponent";
 const CommentsComponents = lazy(() => import("../../views/comments"));
 
 //status options list
@@ -49,10 +52,13 @@ const Edituser = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const loading = useSelector((state) => state?.root?.systemadmin?.loading);
+  const loading = useSelector((state) => state?.root?.users?.loading);
 
   // ** States
-  const rowperpage = useSelector((state) => state?.root?.comment?.rowsPerPagePageComment)
+  // const rowperpage = useSelector((state) => state?.root?.comment?.rowsPerPagePageComment)
+  const rowperpage = useSelector(
+    (state) => state?.root?.harmfulWord?.rowsPerPage
+  );
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(rowperpage)
   const [searchValue, setSearchValue] = useState("")
@@ -67,17 +73,17 @@ const Edituser = () => {
   //formik validation schema
   const validationSchema = Yup.object().shape({
     status: Yup.string().required("Status is required"),
-    nickname: Yup.string(),
+    name: Yup.string(),
     site: Yup.string(),
     email: Yup.string(),
     total_commnet: Yup.string(),
     registration: Yup.string(),
-    last_seen: Yup.string(),
-    last_device: Yup.string(),
+    lastSeen: Yup.string(),
+    device: Yup.string(),
     last_ip_address: Yup.string(),
-    approve_comment: Yup.string(),
-    not_approved_comments: Yup.string(),
-    pending_comments: Yup.string(),
+    approvedComments: Yup.string(),
+    notApprovedComments: Yup.string(),
+    pendingComments: Yup.string(),
   });
   const EditsingleData = useSelector(
     (state) => state?.root?.users?.usereditsingledata
@@ -95,6 +101,7 @@ const Edituser = () => {
         searchValue,
         sortDirection,
         column,
+        "",
         id,
 
       )
@@ -104,17 +111,17 @@ const Edituser = () => {
   //formik initial values
   const initialValues = {
     status: EditsingleData?.status,
-    nickname: EditsingleData?.name,
+    name: EditsingleData?.name,
     site: EditsingleData?.site,
     email: EditsingleData?.email,
-    total_commnet: EditsingleData?.total_commnet,
+    total_commnet: EditsingleData?.totalComments,
     registration: EditsingleData?.updatedAt,
-    last_seen: EditsingleData?.lastSeen,
-    last_device: EditsingleData?.device,
+    lastSeen: EditsingleData?.lastSeen,
+    device: EditsingleData?.device,
     last_ip_address: EditsingleData?.ip,
-    approve_comment: EditsingleData  &&  EditsingleData?.approve_comment!==''? EditsingleData?.approve_comment:0,
-    not_approved_comments: EditsingleData?.not_approved_comments,
-    pending_comments: EditsingleData?.pending_comments,
+    approvedComments:EditsingleData?.approvedComments,
+    notApprovedComments: EditsingleData?.notApprovedComments,
+    pendingComments: EditsingleData?.pendingComments,
   };
 
   const handleSubmit = (values, onSubmitProps) => {
@@ -154,13 +161,16 @@ const Edituser = () => {
     <>
       <head>
         <title>
-          UsersEdit - {usersite == "israelBackOffice" ? "Israel " : "Ittihad"}
+        Edit Users - {usersite == "israelBackOffice" ? "Israel " : "Ittihad"}
           Today back office
         </title>
       </head>
       <div>
-        <CardHeader className=" mb-2 d-flex justify-content-between align-items-center">
-          <CardTitle tag="h4">Users</CardTitle>
+        {
+          loading ? <LoaderComponent></LoaderComponent>:
+          <>
+              <CardHeader className=" mb-2 d-flex justify-content-between align-items-center">
+          <CardTitle tag="h4">{jsonData?.user?.title}</CardTitle>
           <Button
             onClick={() => {
               navigate("/users");
@@ -176,12 +186,12 @@ const Edituser = () => {
           <Nav tabs>
             <NavItem>
               <NavLink onClick={() => setRSelected(1)} active={rSelected === 1}>
-                General Info
+              {jsonData?.user?.user_edit_form?.general_info}
               </NavLink>
             </NavItem>
             <NavItem>
               <NavLink onClick={() => setRSelected(2)} active={rSelected === 2}>
-                Comments
+              {jsonData?.user?.user_edit_form?.comments}
               </NavLink>
             </NavItem>
           </Nav>
@@ -197,7 +207,6 @@ const Edituser = () => {
                   enableReinitialize
                 >
                   {({ values, isSubmitting, setFieldValue, errors }) => (
-                    console.log(values, "values", errors),
                     (
                       <Form>
                         <div className="d-flex justify-content-between align-items-center">
@@ -220,16 +229,17 @@ const Edituser = () => {
                                 size={10}
                               />
                             )}
-                            Save
+                             {jsonData?.user?.user_edit_form?.save}
                           </Button>
                         </div>
                         <hr />
                         <div className="mb-1">
                           <Row>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Status</Label>
+                            <em className="required-red">*</em><Label className="form-label"> {jsonData?.user?.user_edit_form?.status}</Label>
                               <Select
                                 name="status"
+                                isDisabled={!readPermission}
                                 theme={selectThemeColors}
                                 className="react-select"
                                 classNamePrefix="select"
@@ -253,8 +263,8 @@ const Edituser = () => {
                           </Row>
                           <Row>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Nickname</Label>
-                              <Field name="nickname">
+                              <Label className="form-label"> {jsonData?.user?.user_edit_form?.name}</Label>
+                              <Field name="name">
                                 {({ field }) => (
                                   <Input
                                     disabled={true}
@@ -266,13 +276,13 @@ const Edituser = () => {
                                 )}
                               </Field>
                               <ErrorMessage
-                                name="nickname"
+                                name="name"
                                 component="div"
                                 className="text-danger"
                               />
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Site</Label>
+                              <Label className="form-label">{jsonData?.user?.user_edit_form?.site}</Label>
                               <Field name="site">
                                 {({ field }) => (
                                   <Input
@@ -280,7 +290,7 @@ const Edituser = () => {
                                     onKeyPress={handleKeyDown}
                                     type="text"
                                     {...field}
-                                    placeholder="Site"
+                                    placeholder={jsonData?.user?.user_edit_form?.site}
                                   />
                                 )}
                               </Field>
@@ -291,7 +301,7 @@ const Edituser = () => {
                               />
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Email</Label>
+                              <Label className="form-label">{jsonData?.user?.user_edit_form?.email}</Label>
                               <Field name="email">
                                 {({ field }) => (
                                   <Input
@@ -299,7 +309,7 @@ const Edituser = () => {
                                     onKeyPress={handleKeyDown}
                                     type="text"
                                     {...field}
-                                    placeholder="Email"
+                                    placeholder={jsonData?.user?.user_edit_form?.email}
                                   />
                                 )}
                               </Field>
@@ -311,7 +321,7 @@ const Edituser = () => {
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
                               <Label className="form-label">
-                                Total Comments
+                              {jsonData?.user?.user_edit_form?.total_comments}
                               </Label>
                               <Field name="total_commnet">
                                 {({ field }) => (
@@ -320,7 +330,7 @@ const Edituser = () => {
                                     onKeyPress={handleKeyDown}
                                     type="number"
                                     {...field}
-                                    placeholder="Total comment"
+                                    placeholder={EditsingleData?.total_commnet || '0'}
                                     maxLength={11}
                                   />
                                 )}
@@ -335,7 +345,7 @@ const Edituser = () => {
                           {/* <h4 className='mb-0'>Password</h4> */}
                           <Row>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Registration</Label>
+                              <Label className="form-label">{jsonData?.user?.user_edit_form?.registration}</Label>
                               <div className="mb-1">
                                 <Field name="registration">
                                   {({ field }) => (
@@ -344,7 +354,7 @@ const Edituser = () => {
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Registration"
+                                      placeholder={jsonData?.user?.user_edit_form?.registration}
                                     />
                                   )}
                                 </Field>
@@ -356,42 +366,42 @@ const Edituser = () => {
                               </div>
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Last Seen</Label>
+                              <Label className="form-label">{jsonData?.user?.user_edit_form?.last_seen}</Label>
                               <div className="mb-1">
-                                <Field name="last_seen">
+                                <Field name="lastSeen">
                                   {({ field }) => (
                                     <Input
                                       disabled={true}
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Last Seen"
+                                      placeholder={EditsingleData?.lastSeen || '-'}
                                     />
                                   )}
                                 </Field>
                                 <ErrorMessage
-                                  name="last_seen"
+                                  name="lastSeen"
                                   component="div"
                                   className="text-danger"
                                 />
                               </div>
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
-                              <Label className="form-label">Last Device</Label>
+                              <Label className="form-label">{jsonData?.user?.user_edit_form?.last_device}</Label>
                               <div className="mb-1">
-                                <Field name="last_device">
+                                <Field name="device">
                                   {({ field }) => (
                                     <Input
                                       disabled={true}
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Last Device"
+                                      placeholder={EditsingleData?.device || '-'}
                                     />
                                   )}
                                 </Field>
                                 <ErrorMessage
-                                  name="last_device"
+                                  name="device"
                                   component="div"
                                   className="text-danger"
                                 />
@@ -399,7 +409,7 @@ const Edituser = () => {
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
                               <Label className="form-label">
-                                Last IP Address
+                              {jsonData?.user?.user_edit_form?.last_ip_address}
                               </Label>
                               <div className="mb-1">
                                 <Field name="last_ip_address">
@@ -409,7 +419,7 @@ const Edituser = () => {
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Last IP address"
+                                      placeholder={EditsingleData?.ip || '-'}
                                     />
                                   )}
                                 </Field>
@@ -424,17 +434,17 @@ const Edituser = () => {
                           <Row>
                             <Col md="3" sm="12" className="mb-1">
                               <Label className="form-label">
-                                Approved Comments
+                              {jsonData?.user?.user_edit_form?.approved_comments}
                               </Label>
                               <div className="mb-1">
-                                <Field name="approve_comment">
+                                <Field name="approvedComments">
                                   {({ field }) => (
                                     <Input
                                       disabled={true}
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="approve Comment"
+                                      placeholder={EditsingleData?.approvedComments || '0'}
                                     />
                                   )}
                                 </Field>
@@ -447,22 +457,22 @@ const Edituser = () => {
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
                               <Label className="form-label">
-                                Not Approved Comments
+                              {jsonData?.user?.user_edit_form?.not_approved_comments}
                               </Label>
                               <div className="mb-1">
-                                <Field name="not_approved_comments">
+                                <Field name="notApprovedComments">
                                   {({ field }) => (
                                     <Input
                                       disabled={true}
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Not Approved Comments"
+                                      placeholder={EditsingleData?.notApprovedComments || '0'}
                                     />
                                   )}
                                 </Field>
                                 <ErrorMessage
-                                  name="not_approved_comments"
+                                  name="notApprovedComments"
                                   component="div"
                                   className="text-danger"
                                 />
@@ -470,22 +480,22 @@ const Edituser = () => {
                             </Col>
                             <Col md="3" sm="12" className="mb-1">
                               <Label className="form-label">
-                                Pending Comments
+                              {jsonData?.user?.user_edit_form?.pending_comments}
                               </Label>
                               <div className="mb-1">
-                                <Field name="pending_comments">
+                                <Field name="pendingComments">
                                   {({ field }) => (
                                     <Input
                                       disabled={true}
                                       onKeyPress={handleKeyDown}
                                       type="text"
                                       {...field}
-                                      placeholder="Pending comments"
+                                      placeholder={EditsingleData?.pendingComments || '0'}
                                     />
                                   )}
                                 </Field>
                                 <ErrorMessage
-                                  name="pending_comments"
+                                  name="pendingComments"
                                   component="div"
                                   className="text-danger"
                                 />
@@ -516,6 +526,9 @@ const Edituser = () => {
           tableFlag={"pageComment"}
         />
         )}
+          </>
+        }
+       
       </div>
     </>
   );

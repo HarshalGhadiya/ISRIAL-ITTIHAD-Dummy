@@ -19,6 +19,8 @@ import commentSlice from "./commentSlice"
 import pageSlice from "./pageSlice"
 import historyLogSlice from "./historyLogSlice"
 import articalauthSlice from "./articalauthSlice"
+import downloaddataSlice from "./exportdataExelslice"
+import profileSlice from "./profileSlice"
 // import authSlice from "./slices/authSlice";
 
 // Reducers
@@ -40,7 +42,9 @@ const appReducer = combineReducers({
   users:userSlice,
   comment: commentSlice,
   page: pageSlice,
-  history: historyLogSlice
+  dowloadexeledata:downloaddataSlice,
+  history: historyLogSlice,
+  profile:profileSlice
 })
 const rootReducer = (state, action) => {
   if (action.type === "login/logoutdata") {

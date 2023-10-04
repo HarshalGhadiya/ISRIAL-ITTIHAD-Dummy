@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 import axios from "axios"
 import toast from "react-hot-toast"
+import { getCount } from "./commentSlice"
 // import { toast } from "react-toastify";
 // import { ToastContent } from "../../common/ToastContent";
 
@@ -115,6 +116,7 @@ export const tokenapiCall = (otpdata, navigate) => async (dispatch) => {
       )
       console.time("Saved userData")
       dispatch(tokenapiData(response.data))
+      dispatch(getCount())
       dispatch(loadingflag(false))
       toast.success(response.data.message, {
         position: "top-right",

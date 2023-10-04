@@ -7,11 +7,12 @@ import { useTranslation } from "react-i18next";
 
 // ** Reactstrap Imports
 import { Badge } from "reactstrap";
+import { useSelector } from "react-redux";
 
 const VerticalNavMenuLink = ({ item, activeItem }) => {
   // ** Conditional Link Tag, if item has newTab or externalLink props use <a> tag else use NavLink
   const LinkTag = item.externalLink ? "a" : NavLink;
-
+  const count = useSelector((state) => state?.root?.comment?.pendingPageCommentCount)
   // ** Hooks
   const { t } = useTranslation();
 
@@ -36,6 +37,8 @@ const VerticalNavMenuLink = ({ item, activeItem }) => {
               className: ({ isActive }) => {
                 if (isActive && !item.disabled) {
                   return "d-flex align-items-center active";
+                } else {
+                  return "d-flex align-items-center";
                 }
               },
             })}
@@ -54,7 +57,7 @@ const VerticalNavMenuLink = ({ item, activeItem }) => {
 
         {item.badge && item.badgeText ? (
           <Badge className="ms-auto me-1" color={item.badge} pill>
-            {item.badgeText}
+            {item?.id == 'pages' ? count?.pendingPageCount : item?.id == 'comments' ? count?.pendingCommnetCount : item.badgeText}
           </Badge>
         ) : null}
       </LinkTag>

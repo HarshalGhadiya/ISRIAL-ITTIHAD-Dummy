@@ -21,6 +21,8 @@ export default [
   {
     id: "pages",
     title: "Pages",
+    badge: 'danger',
+    badgeText: '2',
     icon: <FileText size={20} />,
     navLink: "/pages",
     Permissions: [
@@ -35,6 +37,8 @@ export default [
   {
     id: "comments",
     title: "Comments",
+    badge: 'danger',
+    badgeText: '2',
     icon: <MessageCircle size={20} />,
     navLink: "/comments",
     Permissions: [

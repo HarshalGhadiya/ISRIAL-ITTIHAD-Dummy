@@ -15,7 +15,7 @@ const Pages = [
   {
     id: "users",
     element: <Edituser />,
-    path: "/edit-users/:id",
+    path: "/users/edit-users/:id",
     meta: {
       //appLayout: true,
       className: "users-application",

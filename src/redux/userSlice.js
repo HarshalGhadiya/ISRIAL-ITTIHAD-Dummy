@@ -8,6 +8,7 @@ const initialState = {
     UserListData: [],
     usereditsingledata:[],
     loading: false,
+    rowsPerPage:10
 };
 
 
@@ -50,6 +51,10 @@ export const userList=
             theme: "light",
           });
         }
+        if (err?.response?.status === 401) {
+          localStorage.clear()
+          navigate('/login')
+      }
         dispatch(loadingflag(false));
       }
     };
@@ -68,7 +73,7 @@ export const userEditsingledata =
       )
       if (response.status === 200) {
         dispatch(userDataeditdata(response.data.data))
-        dispatch(loadingflag(false))
+      dispatch(loadingflag(false))
         toast.success(response.data.message, {
           position: "top-right",
           autoClose: 2000,
@@ -101,6 +106,10 @@ export const userEditsingledata =
           theme: "light",
         })
       }
+      if (err?.response?.status === 401) {
+        localStorage.clear()
+        navigate('/login')
+    }
       dispatch(loadingflag(false))
     }
   }
@@ -172,10 +181,13 @@ export const userEditsingledata =
             userDataeditdata: (state, action) => {
               state.usereditsingledata = action.payload;
           },
+          SetRowPerPage: (state, action) => {
+            state.rowsPerPage = action.payload;
+        },
         },
     });
     
-    export const { loadingflag, userData,userDataeditdata} =
+    export const { loadingflag, userData,userDataeditdata,SetRowPerPage} =
     userSlice.actions;
     
     export default userSlice.reducer;

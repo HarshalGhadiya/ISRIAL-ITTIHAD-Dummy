@@ -37,18 +37,36 @@ import jsonData from "../../locales/en/translation.json"
 //status options list
 const permissionOptions = [
   // { value: '', label: 'Select' },
-  { value: jsonData.roleType.notApplicableValue, label: jsonData.roleType.notApplicableLabel },
-  { value: jsonData.roleType.readWriteValue, label: jsonData.roleType.readWriteLabel },
+  {
+    value: jsonData.roleType.notApplicableValue,
+    label: jsonData.roleType.notApplicableLabel,
+  },
+  {
+    value: jsonData.roleType.readWriteValue,
+    label: jsonData.roleType.readWriteLabel,
+  },
   { value: jsonData.roleType.readValue, label: jsonData.roleType.readLabel },
 ]
 
 const Section = [
-  { value: jsonData.roleType.usersValue, label: jsonData.roleType.usersLabel},
-  { value: jsonData.roleType.usersValue, label: jsonData.roleType.usersLabel},
-  { value: jsonData.roleType.commentsValue, label: jsonData.roleType.commentsLabel},
-  { value: jsonData.roleType.harmfulWordsValue, label: jsonData.roleType.harmfulWordsLabel},
-  { value: jsonData.roleType.settingsValue, label: jsonData.roleType.settingsLabel },
-  { value: jsonData.roleType.systemAdminsValue, label: jsonData.roleType.systemAdminsLabel },
+  { value: jsonData.roleType.usersValue, label: jsonData.roleType.usersLabel },
+  { value: jsonData.roleType.pagesValue, label: jsonData.roleType.pagesLabel },
+  {
+    value: jsonData.roleType.commentsValue,
+    label: jsonData.roleType.commentsLabel,
+  },
+  {
+    value: jsonData.roleType.harmfulWordsValue,
+    label: jsonData.roleType.harmfulWordsLabel,
+  },
+  {
+    value: jsonData.roleType.settingsValue,
+    label: jsonData.roleType.settingsLabel,
+  },
+  {
+    value: jsonData.roleType.systemAdminsValue,
+    label: jsonData.roleType.systemAdminsLabel,
+  },
 ]
 const validationSchema = Yup.object().shape({
   type_name: Yup.string().trim().required(jsonData.roleType.nameError),
@@ -183,7 +201,9 @@ const SystemAdminTypeForm = () => {
     <>
       <head>
         <title>
-          {id !== undefined ? jsonData.roleType.editRole : jsonData.roleType.addRole}
+          {id !== undefined
+            ? jsonData.roleType.editRole
+            : jsonData.roleType.addRole}
           {siteName == "systemBackOffice"
             ? jsonData.roleType.systemBackOffice
             : siteName == "israelBackOffice"
@@ -240,7 +260,8 @@ const SystemAdminTypeForm = () => {
                         <Row>
                           <Col md="6" sm="12" className="mb-1">
                             <Label className="form-label">
-                              <em className="required-red">*</em>{jsonData.roleType.typeName}
+                              <em className="required-red">*</em>
+                              {jsonData.roleType.typeName}
                             </Label>
                             <div className="mb-1">
                               <Field name="type_name">
@@ -269,12 +290,14 @@ const SystemAdminTypeForm = () => {
                         <Row>
                           <Col md="3" sm="12" className="mb-1">
                             <Label className="form-label">
-                              <em className="required-red">*</em>{jsonData.roleType.section}
+                              <em className="required-red">*</em>
+                              {jsonData.roleType.section}
                             </Label>
                           </Col>
                           <Col md="3" sm="12" className="mb-1">
                             <Label className="form-label">
-                              <em className="required-red">*</em>{jsonData.roleType.permission}
+                              <em className="required-red">*</em>
+                              {jsonData.roleType.permission}
                             </Label>
                           </Col>
                         </Row>

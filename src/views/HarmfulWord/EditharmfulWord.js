@@ -46,7 +46,6 @@ const EditharmfulWord = () => {
   );
   const [word, setHarmfulWord] = useState(id ? data?.word : "")
   const usersite = localStorage.getItem("usersite")
-
   useEffect(() => {
     //for access route
     const userData = JSON.parse(localStorage.getItem("userData"))
@@ -137,6 +136,7 @@ const EditharmfulWord = () => {
                     onKeyDown={handleKeyDown}
                     onChange={(e) => {
                       if (e.target.value.trim() == "") {
+                        setHarmfulWord('')
                         setError(true)
                       } else {
                       setHarmfulWord(e.target.value.trim())

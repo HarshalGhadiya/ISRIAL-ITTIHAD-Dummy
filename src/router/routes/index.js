@@ -7,7 +7,7 @@ import Pages from "./Pages"
 import Comments from "./Comments"
 import BadWords from "./HarmfulWords"
 import Settings from "./Settings"
-import SystemAdmin from "./SystemAdmin"
+import SystemAdminRoute from "./SystemAdmin"
 import ProfileArr from "./Profile"
 
 import { Navigate } from "react-router-dom"
@@ -79,7 +79,7 @@ const DefaultRoute = findFirstExistingSection()
 console.log(DefaultRoute, "default")
 // ** Merge Routes
 const Routes = [
-  ...SystemAdmin,
+  ...SystemAdminRoute,
   ...Users,
   ...Pages,
   ...Comments,

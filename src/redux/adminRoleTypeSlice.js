@@ -310,9 +310,9 @@ export const DeleteAdminRoleType =
     } catch (err) {
       if (err?.response?.status === 401 || err?.response?.status === 500) {
         dispatch(loadingflag(false))
-        toast.error(<ToastContent message={err?.response?.data?.message} />, {
+        toast.error(err?.response?.data?.error, {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -326,10 +326,11 @@ export const DeleteAdminRoleType =
         dispatch(loadingflag(false))
         navigate("/error")
       } else if (err?.response?.status === 400) {
+        console.log("sdjkjsdjk", err?.response?.data?.error)
         dispatch(loadingflag(false))
-        toast.error(<ToastContent message={err?.response?.data?.message} />, {
+        toast.error(err?.response?.data?.error, {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,

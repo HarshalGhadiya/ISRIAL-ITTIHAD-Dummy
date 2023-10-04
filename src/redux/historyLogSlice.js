@@ -40,24 +40,25 @@ export const getHistoryComment = (navigate,currentPage, rowsPerPage, searchValue
             dispatch(loadingflag(false));
         }
     } catch (err) {
-        dispatch(loadingflag(false));
-        toast.error(err?.response?.data?.message, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
         if (err?.response?.status === 401) {
             localStorage.clear()
             navigate('/login')
-        } 
-        if (err?.response?.status === 404) {
-            navigate('/error')
-        } 
+        } else if (err?.response?.status === 404) {
+            dispatch(loadingflag(false))
+            navigate("/error")
+        } else if (err?.response?.status === 400) {
+            dispatch(loadingflag(false))
+            toast.error(err?.response?.data?.message, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
         dispatch(loadingflag(false));
     }
 };
